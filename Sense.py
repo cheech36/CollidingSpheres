@@ -71,6 +71,7 @@ class sense:
             if threat_count == 0:
                 # print('No threats detected')
                 # print self.blank_image
+                self.move_net(current_position)
                 return self.blank_image
 
             # if threats detected we will need to check all bounding boxes

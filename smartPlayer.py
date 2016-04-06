@@ -29,7 +29,7 @@ class smartPlayer (player):
         self.sense = sense(id, position, self.scope)
         self.image1 = self.sense.blank_image
         self.brain = 0
-        self.brainEngine = brainEngine(self.brain, self.sense, self.position, 2)
+        self.brainEngine = brainEngine(self.brain, self.sense, self.position, 1)
         self.brainEngine.start()
 
 
