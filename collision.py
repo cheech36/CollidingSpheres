@@ -39,6 +39,8 @@ class aabb:
 
 
         #ommit checking y coordinates for now
+        # Note: Exclusive inequality means if x and z are exactly equal to bounds, incoming will not be detected
+        # to fix this make upper or lower bound inclusive
         if Lower_x < x and  x < Upper_x and  Lower_z < z and  z < Upper_z:
             return 1
         else:
@@ -82,8 +84,8 @@ class aabb:
 
 
     def move(self, displacement):
-        self.Upper += displacement + .5*vector(self.length, self.width, self.height)
-        self.Lower += displacement - .5*vector(self.length, self.width, self.height)
+        self.Upper += displacement
+        self.Lower += displacement
 
 
 

@@ -30,18 +30,18 @@ class sense:
         # setting self.mesh_dim_y to 1 will effectively ignore vertical attacks but will reduce computation
         self.mesh_dim_y = 1
         quadrant_octant_factor = 4 # Set to 4 for Quadrant, 8 for octant
-        # mesh_size will be the number of elements the "detected" numpy array fed to brain
+        # mesh_size will be the number of cell elements in the image array
         self.mesh_size = quadrant_octant_factor*self.mesh_dim_x * self.mesh_dim_y * self.mesh_dim_z
         self.blank_image = [[0 for x in range(2*self.mesh_dim_x)] for x in range(2*self.mesh_dim_z)]
         previous_id =  self.scope_boundary.id
 
-        # Populate mesh with bounding boxes
+        # Populate mesh with bounding cells
         for z in range(-self.mesh_dim_z + 1 , self.mesh_dim_z + 1, mesh_unit_size):
             for x in range(-self.mesh_dim_x + 1, self.mesh_dim_x + 1, mesh_unit_size):
-                mesh_x  = self.mesh_center.x - (x - 1/2)*mesh_unit_size
-                mesh_y  = self.mesh_center.y - 6
-                mesh_z  = self.mesh_center.z - (z - 1/2)*mesh_unit_size
-                mesh_position = vector(mesh_x, mesh_y , mesh_z)
+                cell_x  = self.mesh_center.x - (x - 1/2)*mesh_unit_size
+                cell_y  = self.mesh_center.y - 6
+                cell_z  = self.mesh_center.z - (z - 1/2)*mesh_unit_size
+                mesh_position = vector(cell_x, cell_y , cell_z)
                 u = .5*mesh_unit_size
                 cell = aabb(previous_id + 1, (u, u, u), mesh_position)
                 cell.player_id = self.player_id
@@ -69,17 +69,16 @@ class sense:
     def look(self, current_position):
             threat_count = self.scope_boundary.check_for_players_in_scope(current_position)
             if threat_count == 0:
-                #print('No threats detected')
-                #print self.blank_image
+                # print('No threats detected')
+                # print self.blank_image
                 return self.blank_image
 
-            ## if threats detected we will need to check all bounding boxes
+            # if threats detected we will need to check all bounding boxes
             elif threat_count > 0:
-                #print('Threats Detected')
+                # print('Threats Detected')
                 self.move_net(current_position)
                 image = self.record_image()
                 detected = 0
-                # detected = some function I havent made yet thre returns a NumpyArray
                 return image
 
     def record_image(self):
@@ -90,15 +89,15 @@ class sense:
 
         for cell in self.net:
             status = cell.check_for_players_in_cell()
-            #print('cell_ID: ', cell.id, 'status: ', status)
+            # print('cell_ID: ', cell.id, 'status: ', status)
             image_list.append(status)
         list_index = 0
         for x in range(0,array_dim_x):
             for z in range(0, array_dim_z):
                 status = image_list[list_index]
-                image_array[x][array_dim_z - 1 - z] = status
+                image_array[array_dim_x - 1 - x][array_dim_z - 1 - z] = status
                 list_index += 1
 
-        for row in range(array_dim_x - 1, 0, -1):
+        for row in range(0, array_dim_x):
             print(image_array[row])
         return image_array
