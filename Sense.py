@@ -2,8 +2,6 @@ from __future__ import division
 from collision import *
 from visual import *
 
-
-
 class sense:
 
     def __init__(self, player_id ,current_position, scope):
@@ -95,10 +93,10 @@ class sense:
             #print('cell_ID: ', cell.id, 'status: ', status)
             image_list.append(status)
         list_index = 0
-        for z in range(0,array_dim_x):
-            for x in range(0, array_dim_z):
+        for x in range(0,array_dim_x):
+            for z in range(0, array_dim_z):
                 status = image_list[list_index]
-                image_array[x][z] = status
+                image_array[x][array_dim_z - 1 - z] = status
                 list_index += 1
 
         for row in range(array_dim_x - 1, 0, -1):
