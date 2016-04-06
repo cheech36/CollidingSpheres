@@ -4,6 +4,21 @@ from Sense import *
 import threading
 import time
 
+class brainEngine (threading.Thread):
+    def __init__(self, brain, sense, position, sleep):
+        threading.Thread.__init__(self)
+        self.SLEEP = sleep
+        self.sense = sense
+        self.image1 = sense.blank_image
+        self.position = position
+
+    def run(self):
+        while true:
+            self.image1 = self.sense.look(self.position)
+            #brain.feedforward(self.image1)
+            #reinforcement code here
+            #brain.train()
+            time.sleep(self.SLEEP)
 
 class smartPlayer (player):
     def __init__(self, position, id):
@@ -12,7 +27,13 @@ class smartPlayer (player):
         self.target = vector(0,0)
         self.scope = (10,10,10)
         self.sense = sense(id, position, self.scope)
-        self.imag1 = None
+        self.image1 = self.sense.blank_image
+        self.brain = 0
+        self.brainEngine = brainEngine(self.brain, self.sense, self.position, 2)
+        self.brainEngine.start()
+
+
+
         self.training_sets = [
             [[0, 1], [.125]],                   #Click above
             [[1, 0], [.375]],                    #Click right
@@ -79,20 +100,7 @@ class smartPlayer (player):
         self.brain.inspect()
 
     def look(self):
-        self.imag1 = self.sense.look(self.position)
-
-    class brainEngine (threading.Thread):
-        def __init__(self, threadID, envObj, manager, sleep):
-            threading.Thread.__init__(self)
-            self.threadID = threadID
-            self.SLEEP = sleep
-            self.manager = manager
-            self.envObj = envObj
-
-
-        def run(self):
-            while true:
-                time.sleep(self.SLEEP)
+        self.image1 = self.sense.look(self.position)
 
 
 
