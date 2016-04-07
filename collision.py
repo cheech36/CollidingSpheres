@@ -41,7 +41,9 @@ class aabb:
         #ommit checking y coordinates for now
         # Note: Exclusive inequality means if x and z are exactly equal to bounds, incoming will not be detected
         # to fix this make upper or lower bound inclusive
-        if Lower_x <= x and  x < Upper_x and  Lower_z <= z and  z < Upper_z:
+        if (Lower_x <= x and  x < Upper_x and
+            #Lower_y <= y and  y < Upper_y and
+            Lower_z <= z and  z < Upper_z    ):
             return 1
         else:
             return 0

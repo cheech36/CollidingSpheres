@@ -14,7 +14,7 @@ class sense:
         self.dt = 1
         # Used only for visualization of net, not for detection.
         self.net_visual_display = list()
-        self.net_visible_f = True
+        self.net_visible_f = False
         self.net = self.formNet(scope)
         self.blank_image = None
         self.image = None
@@ -99,6 +99,6 @@ class sense:
                 image_array[array_dim_x - 1 - x][array_dim_z - 1 - z] = status
                 list_index += 1
 
-        for row in range(0, array_dim_x):
-            print(image_array[row])
+        # for row in range(0, array_dim_x):
+        #     print(image_array[row])
         return image_array

@@ -6,8 +6,8 @@ from player import *
 from smartPlayer import *
 
 
-
 class playerManager:
+    envObj = None
     def __init__(self):
         self.activePlayers = list()
         self.playerCount = 0
@@ -15,6 +15,7 @@ class playerManager:
         self.nonZero_FNet_ID = list()
         self.listOfWalkers = list()
         aabb.playerManager = self ## Register with aabb collision class
+        brainEngine.playerManager = self # Register with Brain Engine Class
 
     def createPlayer(self, position = vector):
         newPlayer = player(position, self.playerCount)
@@ -33,7 +34,6 @@ class playerManager:
         return newPlayer
 
     def setPlayerMass(self, mass, id = 'none'):
-
         ##If no id is given set all player to this mass
         if id == 'none':
             for p in self.activePlayers:
@@ -42,7 +42,6 @@ class playerManager:
             self.activePlayers[id].mass = mass
 
     def buildPlayers(self, shape, relativePosition = 0, material='none', id  ='none'):
-
         ##If no id is given add for all players
         if id == 'none':
             for p in self.activePlayers:
@@ -50,28 +49,23 @@ class playerManager:
                 p.body.material = material
                 p.body.radius = shape.radius
                 p.rollEnable = True
-                ## Need to check that it is a sphere first
-                                                    ## If not disable Rolling
+                # Need to check that it is a sphere first
+                # If not disable Rolling
         else:
             self.activePlayers[id].addComponent(shape, relativePosition)
             self.activePlayers[id].body.material = material
             self.activePlayers[id].body.radius = shape.radius     ## Need to check that it is a sphere first
             self.activePlayers[id].rollEnable = True              ## If not disable rolling
 
-
-
     def addToPlayer(self, id, shape, relativePosition = 0, material='none' ):
             self.activePlayers[id].addComponent(self, shape, relativePosition, color, material)
             self.activePlayers[id].body.material = material
-
 
     def updatePlayers(self):
         for player in self.activePlayers:
             player.fullRender()
             player.updateVelocity()
             player.roll()                   ## Assumes player is a sphere, need to add player flag 'rollEnabled'
-
-
 
     def setPlayerBottom(self, yValue):
         for player in self.activePlayers:
@@ -92,7 +86,6 @@ class playerManager:
             self.scene.center = self.psBox.pos
 
     def changePlayer(self, IncVal):
-
         if (self.activePlayerID + IncVal) < 0 or (self.activePlayerID + IncVal + 1) > self.playerCount:
             return self.activePlayers[self.activePlayerID]
         else:
@@ -113,7 +106,6 @@ class playerManager:
         del self.psBox
 
     def createPlayer_Click(self, position, envObj):
-
         newPlayerPosition   = vector()
         newPlayerPosition   = position
 
@@ -132,7 +124,6 @@ class playerManager:
         newPlayer.updatePosition()
         newPlayer.setAcceleration(vector(0,-9.81,0))
         envObj.addForce('floor', newPlayer.getID())
-
 
         id = newPlayer.getID()      ## Use PlayerID to generate a new color
         colorID = id  - 3              ## StartGenerating colors from ID 1
@@ -176,25 +167,38 @@ class playerManager:
             p.removeForce(forceName)
             self.nonZero_FNet_ID.remove(p.getID())
 
-    def jump(self, envObj, active = 'none'):
-
-
-        if active == 'none':
-            active = self.activePlayers[self.activePlayerID]
-        id = active.getID()
-
+    def jump_on_keyup(self, envObj, active):
         if active.position.y == 0:
+            id = active.getID()
             active.changeVelocity(active.jumpCharge)
             active.setAcceleration(vector(0,-9.81,0))
             envObj.activeForcesList.append('floor')
             envObj.activeForcesDict.update({'floor':id})
             self.setForce(id,'floor')
 
+    def jump_on_random(self, envObj, walker ):
+        active = walker
+        if active.position.y == 0:
+            id = walker.getID()
+            active.changeVelocity(active.jumpCharge)
+            active.setAcceleration(vector(0,-9.81,0))
+            envObj.activeForcesList.append('floor')
+            envObj.activeForcesDict.update({'floor':id})
+            self.setForce(id,'floor')
+
+    def jump(self, player):
+        if player.position.y == 0:
+            id = player.getID()
+            player.changeVelocity(player.jumpCharge)
+            player.setAcceleration(vector(0,-9.81,0))
+            self.envObj.activeForcesList.append('floor')
+            self.envObj.activeForcesDict.update({'floor':id})
+            self.setForce(id,'floor')
+
     def setAsWalker(self, player):
         self.listOfWalkers.append(player)
 
     def setTarget( self, targetPosition ):
-
         targetPosition.y = 0                ## Project onto XZ plane
         for player in self.activePlayers:
             if player.getType() == 'smartPlayer':
@@ -202,10 +206,8 @@ class playerManager:
                 player.chase()
 
     def look(self, smart_player):
-
         if smart_player.getType() == 'smartPlayer':
             smart_player.look()
-
         else:
             print('Not Smart')
             return -1

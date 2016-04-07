@@ -172,7 +172,7 @@ class eventHandler:
             self.spaceKeyUp()
 
     def spaceKeyUp(self):
-        self.playerManager.jump(self.env)
+        self.playerManager.jump_on_keyup(self.env, self.activePlayer)
 
 
     def handleClick(self,evt):

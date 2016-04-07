@@ -5,19 +5,30 @@ import threading
 import time
 
 class brainEngine (threading.Thread):
-    def __init__(self, brain, sense, position, sleep):
+    playerManager = None
+    def __init__(self, player1, sleep):
         threading.Thread.__init__(self)
+        self.player = player1
         self.SLEEP = sleep
-        self.sense = sense
-        self.image1 = sense.blank_image
-        self.position = position
+        self.sense = self.player.sense
+        self.image1 = self.sense.blank_image
+        self.position = self.player.position
 
     def run(self):
         while true:
+
             self.image1 = self.sense.look(self.position)
+
             #brain.feedforward(self.image1)
+            # A simple way of analyzing the image to decide if a player is incoming
+            incoming = array(self.image1).any()
+            #If so, tell the player to jump
+            if incoming:
+                self.player.chargeJump()
+                self.playerManager.jump(self.player)
+
             #reinforcement code here
-            #brain.train()
+            #brain.train() ?
             time.sleep(self.SLEEP)
 
 class smartPlayer (player):
@@ -29,7 +40,7 @@ class smartPlayer (player):
         self.sense = sense(id, position, self.scope)
         self.image1 = self.sense.blank_image
         self.brain = 0
-        self.brainEngine = brainEngine(self.brain, self.sense, self.position, 1)
+        self.brainEngine = brainEngine(self, .25)
         self.brainEngine.start()
 
 

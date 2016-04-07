@@ -34,7 +34,7 @@ class player(particle):
                 self.body.rotate(axis=(1,0,0), angle = dthetaZ )
 
     def chargeJump(self):
-        if self.jumpCharge.y < 15:
+        if self.jumpCharge.y < 15 and self.position.y == 0:
             self.jumpCharge.y += self.jumpStrength.y/self.jumpCharge.y
 
     def addComponent(self, shape, relativePosition = 0):
@@ -77,7 +77,7 @@ class player(particle):
         elif dv == 3:
             self.moveDown()
 
-    def jump(self):
+    def jump_on_random(self):
         jumpCharge = vector(0,randint(5,15),0)
         jumpWindow_lower = 55
         jumpWindow_upper = 65

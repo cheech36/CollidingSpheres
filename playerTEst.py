@@ -31,6 +31,7 @@ class enviornment:
 
         self.centerOfMass        = vector()
         self.playerMgr           = playerManager()
+        self.playerMgr.envObj    = self
 
         self.scene1 = display(x=0, y=0, width=1200, height = 600)
         self.scene1.autoscale = False
@@ -53,9 +54,9 @@ class enviornment:
         self.playerMgr.setPlayerBottom(-8)
 
 
-        # self.playerMgr.setAsWalker(self.Walker0)
-        # self.playerMgr.setAsWalker(self.Walker1)
-        # self.playerMgr.setAsWalker(self.Walker2)
+        self.playerMgr.setAsWalker(self.Walker0)
+        self.playerMgr.setAsWalker(self.Walker1)
+        self.playerMgr.setAsWalker(self.Walker2)
         # self.Walker1.train()
         # self.Walker0.train()
         # self.Walker2.train()
@@ -88,7 +89,7 @@ class enviornment:
 
     def run(self):
 
-        #self.randomWalk.start()
+        self.randomWalk.start()
         while True:
             rate(self.rate)
             while self.notPaused:
@@ -154,10 +155,10 @@ class randomWalk (threading.Thread):
         while true:
             for walker in self.manager.listOfWalkers:
                 walker.walk()
-                y = walker.jump()
-                if y != 0:
-#                    print(walker.getID(), ' is jumping :', y)
-                    self.manager.jump(self.envObj, walker)
+                y = walker.jump_on_random()
+                #if y != 0:
+                    #print(walker.getID(), ' is jumping :', y)
+                     #self.manager.jump_on_random(self.envObj, walker)
             time.sleep(self.SLEEP)
 
 
