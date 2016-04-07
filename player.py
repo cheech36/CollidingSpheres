@@ -16,7 +16,10 @@ class player(particle):
         self.bottom = -2
         self.rollEnable = True
         self.boundaryList = []
+
         self.maxSpeed     = 15
+        # Max speed in 2D is sqrt(2) * 15
+        self.collision_history = list()
 
     def fullRender(self):
         self.dr = self.velocity * self.dt
@@ -46,13 +49,18 @@ class player(particle):
     def getBottom(self):
         return self.position.y + self.bottom
 
-
     def printStats(self):
         print( 'PlayerID: ' , self.id )
         print( ' Position', self.getPosition() )
         print(  'velocity', self.getVelocity() )
         print( 'Player Bottom', self.getBottom() )
 
+    def on_collision(self, time , with_player_id ):
+
+        if len(self.collision_history) >= 5:
+            self.collision_history.pop()
+
+        self.collision_history.insert(0,[time,with_player_id])
 
     def setTimeResolution(self, newDt):
         self.dt = newDt
@@ -88,6 +96,7 @@ class player(particle):
             return jumpCharge.y
         else:
             return 0
+
 
 
 

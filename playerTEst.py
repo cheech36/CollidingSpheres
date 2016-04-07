@@ -44,7 +44,7 @@ class enviornment:
         # self.Walker1 = self.playerMgr.creatSmartPlayer(vector(5, 0,  0))
         # self.Walker2 = self.playerMgr.creatSmartPlayer(vector(5, 0,  5))
 
-        self.SmartyPants = self.playerMgr.createSmartPlayer(vector(10, 0,0))
+        self.SmartyPants = self.playerMgr.createSmartPlayer(vector(20, 0,0))
         print('Active player is: ', self.SmartyPants.getID())
         self.Walker0 = self.playerMgr.createPlayer(vector(-10, 0,  0))
         self.Walker1 = self.playerMgr.createPlayer(vector(5, 0,  0))

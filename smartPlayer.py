@@ -13,6 +13,7 @@ class brainEngine (threading.Thread):
         self.sense = self.player.sense
         self.image1 = self.sense.blank_image
         self.position = self.player.position
+        self.playerID = self.player.getID()
 
     def run(self):
         while true:
@@ -26,6 +27,13 @@ class brainEngine (threading.Thread):
             if incoming:
                 self.player.chargeJump()
                 self.playerManager.jump(self.player)
+
+            if len(self.player.collision_history) > 0:
+                collision_data = self.player.collision_history.pop()
+                collision_time = collision_data[0]
+                other_player   = collision_data[1]
+                print(' collision at: ', collision_time, 'between',
+                      self.playerID, ' and ', other_player)
 
             #reinforcement code here
             #brain.train() ?

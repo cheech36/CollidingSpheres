@@ -1,7 +1,7 @@
 from __future__ import print_function
 from __future__ import division
 from visual import *
-import math
+import time
 
 class aabb:
 
@@ -99,13 +99,9 @@ class bs:
 class CollisionMonitor:
 
     interactingSets = dict()
-
-
     def __init__ (self):
         self.time = 0
-
-        # should sort through objectList, caclute, then assign bounding sphere, bound box etc
-        # or a superpostion of bounding structures
+        self.start_time = time.time()
 
     def check_player_player_collision(self, setID):
         if len(self.interactingSets) == 0:
@@ -131,11 +127,13 @@ class CollisionMonitor:
         u1_vec           = objX.velocity
         u2_vec           = objY.velocity
         u                = m1*m2/(m1+m2)
-        rNorselfvec        = r1Norm - r2Norm
+        rNorselfvec      = r1Norm - r2Norm
         vRel_vec         = u1_vec - u2_vec
         v1_vec           = u1_vec - 2*(u/m1)*vRel_vec.proj(rNorselfvec)
         v2_vec           = u2_vec + 2*(u/m2)*vRel_vec.proj(rNorselfvec)
-
+        elapsed_time = time.time() - self.start_time
+        objX.on_collision(elapsed_time, objY.getID())
+        objY.on_collision(elapsed_time, objX.getID())
         objX.setVelocity(v1_vec)
         objY.setVelocity(v2_vec)
 
