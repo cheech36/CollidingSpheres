@@ -3,6 +3,7 @@ from __future__ import division
 from visual import *
 from particle import *
 from player import *
+from smartPlayer2 import *
 from smartPlayer import *
 
 
@@ -15,7 +16,7 @@ class playerManager:
         self.nonZero_FNet_ID = list()
         self.listOfWalkers = list()
         aabb.playerManager = self ## Register with aabb collision class
-        brainEngine.playerManager = self # Register with Brain Engine Class
+#        brainEngine.playerManager = self # Register with Brain Engine Class
 
     def createPlayer(self, position = vector):
         newPlayer = player(position, self.playerCount)
@@ -26,7 +27,8 @@ class playerManager:
         return newPlayer
 
     def createSmartPlayer(self, position = vector):
-        newPlayer = smartPlayer(position, self.playerCount)
+#        newPlayer = smartPlayer(position, self.playerCount)
+        newPlayer = smartPlayer2(position, self.playerCount)
         self.activePlayers.append(newPlayer)
         self.playerCount += 1
         if len(self.activePlayers) == 1:
