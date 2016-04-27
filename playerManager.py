@@ -4,7 +4,8 @@ from visual import *
 from particle import *
 from player import *
 from smartPlayer2 import *
-from smartPlayer import *
+from brainEngine import *
+#from smartPlayer import *
 
 
 class playerManager:
@@ -16,7 +17,7 @@ class playerManager:
         self.nonZero_FNet_ID = list()
         self.listOfWalkers = list()
         aabb.playerManager = self ## Register with aabb collision class
-#        brainEngine.playerManager = self # Register with Brain Engine Class
+        brainEngine.playerManager = self # Register with Brain Engine Class
 
     def createPlayer(self, position = vector):
         newPlayer = player(position, self.playerCount)

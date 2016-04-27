@@ -20,11 +20,11 @@ class brainEngine (threading.Thread):
 
             #brain.feedforward(self.image1)
             # A simple way of analyzing the image to decide if a player is incoming
-#            incoming = array(self.image1).any()
-#            #If so, tell the player to jump
-#            if incoming:
-#                self.player.chargeJump()
-#                self.playerManager.jump(self.player)
+            incoming = array(self.image1).any()
+            #If so, tell the player to jump
+            if incoming:
+                self.player.chargeJump()
+                self.playerManager.jump(self.player)
 
             if len(self.player.collision_history) > 0:
                 collision_data = self.player.collision_history.pop()
