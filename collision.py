@@ -162,6 +162,7 @@ class CollisionMonitor:
                     self.on_player_player_collision(objX, objY)
 
     def check_obstacle_player_collision(self, obstacle_key, player_key):
+        self.OBS_KEY = obstacle_key
         if len(self.interactingSets) == 0:
             print("Add interacting Set with 'addSet'")
             return
@@ -201,6 +202,8 @@ class CollisionMonitor:
 #                            plr.getPosition()[1] = 0
 
     def on_player_player_collision(self,objX, objY):
+
+
         m1               = objX.mass
         m2               = objY.mass
         r1Norm           = objX.position
@@ -210,13 +213,46 @@ class CollisionMonitor:
         u                = m1*m2/(m1+m2)
         rNorselfvec      = r1Norm - r2Norm
         vRel_vec         = u1_vec - u2_vec
-        v1_vec           = u1_vec - 2*(u/m1)*vRel_vec.proj(rNorselfvec)
-        v2_vec           = u2_vec + 2*(u/m2)*vRel_vec.proj(rNorselfvec)
+        dv1 = 2*(u/m1)*vRel_vec.proj(rNorselfvec)
+        dv2 = 2*(u/m2)*vRel_vec.proj(rNorselfvec)
+        v1_vec           = u1_vec - dv1
+        v2_vec           = u2_vec + dv2
         elapsed_time = time.time() - self.start_time
+
+        #This should be true for a valid collision
+#        if(u1_vec.dot(rNorselfvec) <= 0 and u2_vec.dot(rNorselfvec) >= 0):
+
+        #print('collision')
+        #This should be true only for an invalid collision
+        if(u1_vec.dot(rNorselfvec) >= 0 and u2_vec.dot(rNorselfvec) <= 0):
+            print('Entangled')
+            tol  = .05
+            rpen = mag(r1Norm - r2Norm)
+            dr1  = (rpen + tol)*rNorselfvec
+            dr2  = (rpen + tol)*-rNorselfvec
+            #Now check to make sure the 2 balls are not moving through another object
+            hold_X = 0
+            hold_Y = 0
+            obstacles = self.interactingSets[self.OBS_KEY]
+            for obs in obstacles:
+                   hold_X += obs.check(objX)
+                   hold_Y += obs.check(objY)
+            #Now displace each player to disentangle them
+            print('Disentangling')
+            if not(hold_X):
+                objX.changePosition(dr1)
+            else:
+                print('Cant move X')
+            if not(hold_Y):
+                objY.changePosition(dr2)
+            else:
+                print('Cant move Y')
+
         objX.on_collision(elapsed_time, objY.getID())
         objY.on_collision(elapsed_time, objX.getID())
         objX.setVelocity(v1_vec)
         objY.setVelocity(v2_vec)
+
 
 
     def addSet(self, newSet):

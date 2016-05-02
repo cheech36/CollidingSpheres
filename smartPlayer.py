@@ -32,8 +32,8 @@ class brainEngine (threading.Thread):
                 collision_data = self.player.collision_history.pop()
                 collision_time = collision_data[0]
                 other_player   = collision_data[1]
-                print(' collision at: ', collision_time, 'between',
-                      self.playerID, ' and ', other_player)
+#                print(' collision at: ', collision_time, 'between',
+#                      self.playerID, ' and ', other_player)
 
             #reinforcement code here
             #brain.train() ?
