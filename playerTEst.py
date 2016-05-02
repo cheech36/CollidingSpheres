@@ -26,6 +26,8 @@ class enviornment:
         self.pauseCount = 0
         self.activeForcesDict    = dict()
         self.activeForcesList    = list()
+        self.arena_boundary      = list()    # includes the walls and the floor at this point
+
         self.forceFuncDict       = {'floor':self.floor, 'friction':self.friction}
         self.uFric = .15
 
@@ -40,9 +42,6 @@ class enviornment:
         self.playerMgr.scene( self.scene1)
 
 
-        # self.Walker0 = self.playerMgr.creatSmartPlayer(vector(-10, 0,  0))
-        # self.Walker1 = self.playerMgr.creatSmartPlayer(vector(5, 0,  0))
-        # self.Walker2 = self.playerMgr.creatSmartPlayer(vector(5, 0,  5))
 
         self.SmartyPants = self.playerMgr.createSmartPlayer(vector(20, 0,0))
         print('Active player is: ', self.SmartyPants.getID())
@@ -57,18 +56,12 @@ class enviornment:
         self.playerMgr.setAsWalker(self.Walker0)
         self.playerMgr.setAsWalker(self.Walker1)
         self.playerMgr.setAsWalker(self.Walker2)
-        # self.Walker1.train()
-        # self.Walker0.train()
-        # self.Walker2.train()
-        #self.SmartyPants.train()
-
-
 
 ## Other Player Attributes
         self.playerMgr.buildPlayers(sphere(radius = 2, color = color.cyan, opacity = 1  ), vector(0,-6,0), materials.wood, 0)
-        self.playerMgr.buildPlayers(sphere(radius = 2, color = color.blue, opacity = .4 ), vector(0,-6,0), materials.wood, 1)
-        self.playerMgr.buildPlayers(sphere(radius = 2, color = color.green, opacity = .4 ), vector(0,-6,0), materials.wood, 2)
-        self.playerMgr.buildPlayers(sphere(radius = 2, color = (.996,.616,.016), opacity = .4), vector(0,-6, 0), materials.wood, 3)
+        self.playerMgr.buildPlayers(sphere(radius = 2, color = color.blue, opacity = 1 ), vector(0,-6,0), materials.wood, 1)
+        self.playerMgr.buildPlayers(sphere(radius = 2, color = color.green, opacity = 1 ), vector(0,-6,0), materials.wood, 2)
+        self.playerMgr.buildPlayers(sphere(radius = 2, color = (.996,.616,.016), opacity = 1), vector(0,-6, 0), materials.wood, 3)
         self.playerMgr.setPlayerMass(20)
 
 
@@ -76,20 +69,28 @@ class enviornment:
 ## Other Player Attributes
 
         self.floor1    = flr(self.playerMgr.getPlayerBottom(0))
-        print(self.floor1.getFloorTop())
-        self.frontWall = obstacle((0,     -6.75, -23)  ,(110, 0,  0),2.5, 3)
-        self.backWall = obstacle ((0,     -6.75,  23)  ,(110, 0,  0),2.5, 3)
-        self.leftWall = obstacle ((-53.5, -6.75,    0) ,(0,   0, 44),2.5, 3)
-        self.rightWall = obstacle((53.5,  -6.75,     0),(0,   0, 44),2.5, 3)
 
+        print(self.floor1.getFloorTop())
+        self.frontWall = obstacle((0,     -6.75, -23)  ,(110, 0,  0),2.5, 3, bp('z', -20,'neg'))
+        self.backWall = obstacle ((0,     -6.75,  23)  ,(110, 0,  0),2.5, 3, bp('z',  20,'pos'))
+        self.leftWall = obstacle ((-53.5, -6.75,    0) ,(0,   0, 44),2.5, 3, bp('x', -50,'neg'))
+        self.rightWall = obstacle((53.5,  -6.75,     0),(0,   0, 44),2.5, 3, bp('x',  50,'pos'))
+
+        self.arena_boundary.append(self.floor1)
+        self.arena_boundary.append(self.frontWall)
+        self.arena_boundary.append(self.backWall)
+        self.arena_boundary.append(self.leftWall)
+        self.arena_boundary.append(self.rightWall)
 
         self.collisionTest1 = CollisionMonitor()
         self.PLAYERS_COLLISION_KEY = self.collisionTest1.addSet(self.playerMgr.activePlayers)
+        self.ARENA_BOUNDARY_KEY    = self.collisionTest1.addSet(self.arena_boundary)
+
         self.randomWalk = randomWalk(1,self, self.playerMgr,.5)
 
     def run(self):
 
-        self.randomWalk.start()
+        #self.randomWalk.start()
         while True:
             rate(self.rate)
             while self.notPaused:
@@ -97,7 +98,9 @@ class enviornment:
                 self.playerMgr.updatePlayers()
                 self.playerMgr.applyForces(self)
                 self.collisionTest1.check_player_player_collision(self.PLAYERS_COLLISION_KEY)
-                self.walls()
+                self.collisionTest1.check_obstacle_player_collision(self.ARENA_BOUNDARY_KEY,
+                                                                    self.PLAYERS_COLLISION_KEY)
+                #self.walls()
 
             if self.pauseCount == 0:
                 print('Paused')

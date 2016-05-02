@@ -121,7 +121,7 @@ class eventHandler:
             self.activePlayer.setPosition(vector(-5,0,0))
 
     def pKeyDown(self):
-        self.activePlayer.printStats()
+        self.activePlayer.print_stats()
 
     def oneKeyDown(self):
         self.activePlayer = self.env.p1

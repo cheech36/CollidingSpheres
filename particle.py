@@ -23,6 +23,7 @@ class particle:
         self.forcesList = list()
  
         self.body         = sphere(pos=vector(0,0,0), radius = 0)                ## any simple shape
+        self.origin       = vector(position)
 
     def getPosition(self):
         return self.position
@@ -123,3 +124,28 @@ class particle:
         finalSpeed   =  self.getVelocity().z + 2
         if self.position.y == 0 and (self.getVelocity().z < self.maxSpeed or finalSpeed < initialSpeed):
             self.changeVelocity( (0,0,2 ) )
+
+    def getOrigin(self):
+        return vector(self.origin)
+
+    def reset_position(self, axis = 3):
+        origin = vector(self.origin)
+        if axis == 3:
+            self.setPosition(origin)
+
+        elif axis == 0:
+            self.position.x = origin.x
+
+        elif axis == 1:
+            self.position.y = origin.y
+
+        elif axis == 2:
+            self.position.z = origin.z
+
+        self.updatePosition()
+
+
+    def print_stats(self):
+        print('position: ',self.position)
+        print('velocity: ',self.velocity)
+        print('acceleration:', self.acceleration)

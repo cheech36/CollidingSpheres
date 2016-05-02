@@ -4,7 +4,6 @@ from visual import *
 import time
 
 class aabb:
-
     playerManager = None
     def __init__(self, id, scope, pos_Rel_Center = vector(0,0,0) ):
 
@@ -15,8 +14,8 @@ class aabb:
         else:
             return
         self.length = 2*scope[0]
-        self.height  = 2*scope[1]
-        self.width = 2*scope[2]
+        self.height = 2*scope[1]
+        self.width  = 2*scope[2]
 
         ## This part gets updated each call to look()
         self.location = vector(pos_Rel_Center)
@@ -96,6 +95,46 @@ class bs:
     def __init__(self, interactingSets):
         pass
 
+# Bounding Plane
+class bp:
+    #Incoming direction positive, negative, or both
+    direction = {'pos':1, 'neg':-1 , 'bi':0}
+    axis      = {'x':0, 'y':1, 'z':2}
+    COLLISION_THRESHOLD = .01
+    def __init__(self,axis_name , axis_value,  mode = 'bi'):
+        self.axis_name = axis_name
+        self.norm_axis = self.axis[axis_name]
+        self.axis_mode = self.direction[mode]
+        self.axis_value = axis_value
+        self.player_pos = 0
+        self.collsion_data = [0,0,0,0,0]
+
+    def check(self, player):
+
+        # Check either the x, y, or z component of the players position
+        pos = player.getPosition()[self.norm_axis]
+        if self.axis_mode == 0 and False:
+            # Handle this later
+            pass
+
+        elif self.axis_mode == -1 and pos < self.axis_value:
+            self.collsion_data[0] = self.norm_axis
+            return 1
+
+        elif self.axis_mode == 1  and pos > self.axis_value:
+            self.collsion_data[0] = self.norm_axis
+            return 1
+
+        else:
+            self.collsion_data[0] = self.norm_axis
+            return 0
+
+    def getdata(self):
+        return self.collsion_data
+
+
+
+
 class CollisionMonitor:
 
     interactingSets = dict()
@@ -118,6 +157,40 @@ class CollisionMonitor:
                 min_distance = objX.body.radius + objY.body.radius
                 if distance.mag <= min_distance:
                     self.on_player_player_collision(objX, objY)
+
+    def check_obstacle_player_collision(self, obstacle_key, player_key):
+        if len(self.interactingSets) == 0:
+            print("Add interacting Set with 'addSet'")
+            return
+
+        obstacles = self.interactingSets[obstacle_key]
+        players   = self.interactingSets[player_key]
+        n_obstacles = len(obstacles)
+        n_players  = len(players)
+
+        for obs in obstacles:
+            for plr in players:
+               if(obs.check(plr)):
+                   vel_norm = obs.getdata()[0]
+
+                   if(vel_norm == 1):
+                       #Bouncing vertically of a plane
+                       plr.getVelocity()[vel_norm] = 0
+                       plr.getPosition()[1] = 0
+
+
+                   else:
+                        #Reflect off horizontal planes
+                        plr.getVelocity()[vel_norm] *= -1
+
+#                   if(plr.getVelocity()[1] > 0):
+#                        if(plr.getPosition()[1] > .5 ):
+#                            plr.setAcceleration(vector(0,-9.81,0))
+#                        else:
+#                            plr.setAcceleration(vector(0,0,0))
+#                            plr.getPosition()[1] = 0
+
+
 
     def on_player_player_collision(self,objX, objY):
         m1               = objX.mass

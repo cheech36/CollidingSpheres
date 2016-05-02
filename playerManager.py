@@ -3,9 +3,9 @@ from __future__ import division
 from visual import *
 from particle import *
 from player import *
-from smartPlayer2 import *
+#from smartPlayer2 import *
 from brainEngine import *
-#from smartPlayer import *
+from smartPlayer import *
 
 
 class playerManager:
@@ -28,8 +28,8 @@ class playerManager:
         return newPlayer
 
     def createSmartPlayer(self, position = vector):
-#        newPlayer = smartPlayer(position, self.playerCount)
-        newPlayer = smartPlayer2(position, self.playerCount)
+        newPlayer = smartPlayer(position, self.playerCount)
+#        newPlayer = smartPlayer2(position, self.playerCount)
         self.activePlayers.append(newPlayer)
         self.playerCount += 1
         if len(self.activePlayers) == 1:
