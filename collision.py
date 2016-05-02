@@ -228,8 +228,8 @@ class CollisionMonitor:
             print('Entangled')
             tol  = .05
             rpen = mag(r1Norm - r2Norm)
-            dr1  = (rpen + tol)*rNorselfvec
-            dr2  = (rpen + tol)*-rNorselfvec
+            dr1  = (rpen + tol)*rNorselfvec.norm()
+            dr2  = (rpen + tol)*-rNorselfvec.norm()
             #Now check to make sure the 2 balls are not moving through another object
             hold_X = 0
             hold_Y = 0
