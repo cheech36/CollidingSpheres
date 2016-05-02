@@ -174,7 +174,7 @@ class playerManager:
         if active.position.y == 0:
             id = active.getID()
             active.changeVelocity(active.jumpCharge)
-            active.setAcceleration(vector(0,-9.81,0))
+            #active.setAcceleration(vector(0,-9.81,0))
             envObj.activeForcesList.append('floor')
             envObj.activeForcesDict.update({'floor':id})
             self.setForce(id,'floor')
@@ -184,7 +184,7 @@ class playerManager:
         if active.position.y == 0:
             id = walker.getID()
             active.changeVelocity(active.jumpCharge)
-            active.setAcceleration(vector(0,-9.81,0))
+            #active.setAcceleration(vector(0,-9.81,0))
             envObj.activeForcesList.append('floor')
             envObj.activeForcesDict.update({'floor':id})
             self.setForce(id,'floor')
@@ -193,7 +193,7 @@ class playerManager:
         if player.position.y == 0:
             id = player.getID()
             player.changeVelocity(player.jumpCharge)
-            player.setAcceleration(vector(0,-9.81,0))
+            #player.setAcceleration(vector(0,-9.81,0))
             self.envObj.activeForcesList.append('floor')
             self.envObj.activeForcesDict.update({'floor':id})
             self.setForce(id,'floor')

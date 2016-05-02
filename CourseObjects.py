@@ -35,6 +35,9 @@ class flr:
     def check(m_, player):
         return m_.boundary.check(player)
 
+    def gettype(m_):
+        return 2
+
     def getdata(m_):
         return m_.boundary.getdata()
 
@@ -58,3 +61,6 @@ class obstacle:
 
     def getdata(m_):
         return m_.boundary.getdata()
+
+    def gettype(m_):
+        return 1

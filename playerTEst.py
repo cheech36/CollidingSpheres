@@ -29,7 +29,7 @@ class enviornment:
         self.arena_boundary      = list()    # includes the walls and the floor at this point
 
         self.forceFuncDict       = {'floor':self.floor, 'friction':self.friction}
-        self.uFric = .15
+        self.uFric = .10
 
         self.centerOfMass        = vector()
         self.playerMgr           = playerManager()
@@ -52,7 +52,7 @@ class enviornment:
 
         self.playerMgr.setPlayerBottom(-8)
 
-
+        self.playerMgr.setAsWalker(self.SmartyPants)
         self.playerMgr.setAsWalker(self.Walker0)
         self.playerMgr.setAsWalker(self.Walker1)
         self.playerMgr.setAsWalker(self.Walker2)
@@ -69,14 +69,14 @@ class enviornment:
 ## Other Player Attributes
 
         self.floor1    = flr(self.playerMgr.getPlayerBottom(0))
-
-        print(self.floor1.getFloorTop())
+        self.ceiling   = bp('y', .05, 'pos')
         self.frontWall = obstacle((0,     -6.75, -23)  ,(110, 0,  0),2.5, 3, bp('z', -20,'neg'))
         self.backWall = obstacle ((0,     -6.75,  23)  ,(110, 0,  0),2.5, 3, bp('z',  20,'pos'))
         self.leftWall = obstacle ((-53.5, -6.75,    0) ,(0,   0, 44),2.5, 3, bp('x', -50,'neg'))
         self.rightWall = obstacle((53.5,  -6.75,     0),(0,   0, 44),2.5, 3, bp('x',  50,'pos'))
 
         self.arena_boundary.append(self.floor1)
+        self.arena_boundary.append(self.ceiling)
         self.arena_boundary.append(self.frontWall)
         self.arena_boundary.append(self.backWall)
         self.arena_boundary.append(self.leftWall)
@@ -90,7 +90,7 @@ class enviornment:
 
     def run(self):
 
-        #self.randomWalk.start()
+        self.randomWalk.start()
         while True:
             rate(self.rate)
             while self.notPaused:
@@ -159,9 +159,9 @@ class randomWalk (threading.Thread):
             for walker in self.manager.listOfWalkers:
                 walker.walk()
                 y = walker.jump_on_random()
-                #if y != 0:
+                if y != 0:
                     #print(walker.getID(), ' is jumping :', y)
-                     #self.manager.jump_on_random(self.envObj, walker)
+                    self.manager.jump_on_random(self.envObj, walker)
             time.sleep(self.SLEEP)
 
 

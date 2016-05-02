@@ -101,6 +101,7 @@ class bp:
     direction = {'pos':1, 'neg':-1 , 'bi':0}
     axis      = {'x':0, 'y':1, 'z':2}
     COLLISION_THRESHOLD = .01
+
     def __init__(self,axis_name , axis_value,  mode = 'bi'):
         self.axis_name = axis_name
         self.norm_axis = self.axis[axis_name]
@@ -108,6 +109,7 @@ class bp:
         self.axis_value = axis_value
         self.player_pos = 0
         self.collsion_data = [0,0,0,0,0]
+        self.type = 0
 
     def check(self, player):
 
@@ -132,7 +134,8 @@ class bp:
     def getdata(self):
         return self.collsion_data
 
-
+    def gettype(self):
+        return self.type
 
 
 class CollisionMonitor:
@@ -162,26 +165,33 @@ class CollisionMonitor:
         if len(self.interactingSets) == 0:
             print("Add interacting Set with 'addSet'")
             return
-
         obstacles = self.interactingSets[obstacle_key]
         players   = self.interactingSets[player_key]
-        n_obstacles = len(obstacles)
-        n_players  = len(players)
-
         for obs in obstacles:
             for plr in players:
                if(obs.check(plr)):
-                   vel_norm = obs.getdata()[0]
-
-                   if(vel_norm == 1):
-                       #Bouncing vertically of a plane
-                       plr.getVelocity()[vel_norm] = 0
-                       plr.getPosition()[1] = 0
-
-
+                   type = obs.gettype()
+                   if type == 0:
+                       pass
+                       self.on_crossing_ceiling(obs, plr)
                    else:
-                        #Reflect off horizontal planes
-                        plr.getVelocity()[vel_norm] *= -1
+                       self.on_obstacle_player_collision(obs, plr)
+
+
+    def on_obstacle_player_collision(self,obs, plr):
+       vel_norm = obs.getdata()[0]
+       if(vel_norm == 1):
+           #Bouncing vertically of a plane
+           plr.getVelocity()[vel_norm] = 0
+           plr.getPosition()[1] = 0
+
+       else:
+            #Reflect off horizontal planes
+            plr.getVelocity()[vel_norm] *= -1
+
+
+    def on_crossing_ceiling(self, obs, plr):
+        plr.setAcceleration(vector(0,-9.81,0))
 
 #                   if(plr.getVelocity()[1] > 0):
 #                        if(plr.getPosition()[1] > .5 ):
@@ -189,8 +199,6 @@ class CollisionMonitor:
 #                        else:
 #                            plr.setAcceleration(vector(0,0,0))
 #                            plr.getPosition()[1] = 0
-
-
 
     def on_player_player_collision(self,objX, objY):
         m1               = objX.mass
