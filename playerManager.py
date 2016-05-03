@@ -126,7 +126,6 @@ class playerManager:
         self.buildPlayers(sphere(radius = 2, color = color.red ), vector(0,-6,0), materials.wood, newPlayer.getID() )
         newPlayer.updatePosition()
         newPlayer.setAcceleration(vector(0,-9.81,0))
-        envObj.addForce('floor', newPlayer.getID())
 
         id = newPlayer.getID()      ## Use PlayerID to generate a new color
         colorID = id  - 3              ## StartGenerating colors from ID 1
@@ -139,9 +138,6 @@ class playerManager:
 
         print(newColor)
         newPlayer.mass = 80
-        envObj.activeForcesList.append('floor')
-        envObj.activeForcesDict.update({'floor':newPlayer.getID()})
-        self.setForce(newPlayer.getID(),'floor')
 
     def applyForces(self,env):
         if len(self.nonZero_FNet_ID) != 0:    ##Call all active Forces
@@ -174,29 +170,19 @@ class playerManager:
         if active.position.y == 0:
             id = active.getID()
             active.changeVelocity(active.jumpCharge)
-            #active.setAcceleration(vector(0,-9.81,0))
-            envObj.activeForcesList.append('floor')
-            envObj.activeForcesDict.update({'floor':id})
-            self.setForce(id,'floor')
+
+
 
     def jump_on_random(self, envObj, walker ):
         active = walker
         if active.position.y == 0:
             id = walker.getID()
             active.changeVelocity(active.jumpCharge)
-            #active.setAcceleration(vector(0,-9.81,0))
-            envObj.activeForcesList.append('floor')
-            envObj.activeForcesDict.update({'floor':id})
-            self.setForce(id,'floor')
 
     def jump(self, player):
         if player.position.y == 0:
             id = player.getID()
             player.changeVelocity(player.jumpCharge)
-            #player.setAcceleration(vector(0,-9.81,0))
-            self.envObj.activeForcesList.append('floor')
-            self.envObj.activeForcesDict.update({'floor':id})
-            self.setForce(id,'floor')
 
     def setAsWalker(self, player):
         self.listOfWalkers.append(player)

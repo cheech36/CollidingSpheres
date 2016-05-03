@@ -89,7 +89,6 @@ class aabb:
         self.Lower += displacement
 
 
-
 # Bounding Sphere Class
 class bs:
     def __init__(self, interactingSets):
@@ -112,7 +111,6 @@ class bp:
         self.type = 0
 
     def check(self, player):
-
         # Check either the x, y, or z component of the players position
         pos = player.getPosition()[self.norm_axis]
         if self.axis_mode == 0 and False:
@@ -137,9 +135,7 @@ class bp:
     def gettype(self):
         return self.type
 
-
 class CollisionMonitor:
-
     interactingSets = dict()
     def __init__ (self):
         self.time = 0
@@ -178,32 +174,25 @@ class CollisionMonitor:
                    else:
                        self.on_obstacle_player_collision(obs, plr)
 
-
     def on_obstacle_player_collision(self,obs, plr):
        vel_norm = obs.getdata()[0]
        if(vel_norm == 1):
-           #Bouncing vertically of a plane
-           plr.getVelocity()[vel_norm] = 0
+       #Bouncing vertically of a plane
+           #Set to 0 to turn off bouncing
+           plr.getVelocity()[vel_norm] *= -.7
+           # For some reason 2 this threshold needs to be ~ 2 or the balls continue to bounce
+           if abs(plr.getVelocity()[vel_norm]) < 2:
+               plr.getVelocity()[vel_norm] = 0
            plr.getPosition()[1] = 0
-
+           plr.acceleration[1] = 0
        else:
             #Reflect off horizontal planes
             plr.getVelocity()[vel_norm] *= -1
 
-
     def on_crossing_ceiling(self, obs, plr):
         plr.setAcceleration(vector(0,-9.81,0))
 
-#                   if(plr.getVelocity()[1] > 0):
-#                        if(plr.getPosition()[1] > .5 ):
-#                            plr.setAcceleration(vector(0,-9.81,0))
-#                        else:
-#                            plr.setAcceleration(vector(0,0,0))
-#                            plr.getPosition()[1] = 0
-
     def on_player_player_collision(self,objX, objY):
-
-
         m1               = objX.mass
         m2               = objY.mass
         r1Norm           = objX.position
@@ -218,11 +207,6 @@ class CollisionMonitor:
         v1_vec           = u1_vec - dv1
         v2_vec           = u2_vec + dv2
         elapsed_time = time.time() - self.start_time
-
-        #This should be true for a valid collision
-#        if(u1_vec.dot(rNorselfvec) <= 0 and u2_vec.dot(rNorselfvec) >= 0):
-
-        #print('collision')
         #This should be true only for an invalid collision
         if(u1_vec.dot(rNorselfvec) >= 0 and u2_vec.dot(rNorselfvec) <= 0):
             print('Entangled')
@@ -247,13 +231,10 @@ class CollisionMonitor:
                 objY.changePosition(dr2)
             else:
                 print('Cant move Y')
-
         objX.on_collision(elapsed_time, objY.getID())
         objY.on_collision(elapsed_time, objX.getID())
         objX.setVelocity(v1_vec)
         objY.setVelocity(v2_vec)
-
-
 
     def addSet(self, newSet):
         newKey = len(self.interactingSets) + 1

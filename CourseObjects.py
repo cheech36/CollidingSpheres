@@ -19,8 +19,6 @@ class flr:
 
     def getFloorTop(m_):
         return m_.rect1.pos.y + m_.rect1.height/2
-        #print (m_.rect1.pos.y + m_.rect1.height/2)
-
 
     def friction(m_, speed):
         speed.x -=  (m_.dt * m_.uFric * speed.norm().x)
