@@ -1,14 +1,11 @@
 from visual import*
 from player import*
 class eventHandler:
-
     def __init__(self , envObj):
         self.env          =  envObj
         self.playerManager = envObj.playerMgr
         self.activePlayer = self.playerManager.getActivePlayer()
         self.mode         = 0
-
-
         self.env.scene1.bind('keydown', self.handleKeyDown )
         self.env.scene1.bind('keyup'  , self.handleKeyUp   )
         self.env.scene1.bind('click'  , self.handleClick   )
@@ -26,42 +23,41 @@ class eventHandler:
         if evt.key == 'down':
             self.downKeyDown()
 
-        if evt.key == " ":
+        if evt.key == " ":     # Jump
             self.spaceKeyDown()
 
-        if evt.key == 's':
+        if evt.key == 's':     # Stop
             self.sKeyDown()
 
-        if evt.key == 'f':
+        if evt.key == 'f':     # Turn on friction
             self.fKeyDown()
 
-        if evt.key == 'r':
+        if evt.key == 'r':     # Return to position
             self.rKeyDown()
 
-        if evt.key == 'p':
+        if evt.key == 'p':     # Print stats
             self.pKeyDown()
 
-        if evt.key == '1':
+        if evt.key == '1':      # Don't press
             self.oneKeyDown()
 
-        if evt.key == '2':
+        if evt.key == '2':      # Don't press
             self.twoKeyDown()
 
-        if evt.key == '3':
+        if evt.key == '3':      # Don't press
             self.threeKeyDown()
 
-        if evt.key == 'f1':
+        if evt.key == 'f1':     # Pause
             self.f1KeyDown()
 
-        if evt.key == 't':
+        if evt.key == 't':      # Train - Not working
             self.tKeyDown()
 
-        if evt.key == 'l':
+        if evt.key == 'l':      # Look  - Don't use
             print('Player is at: ', self.activePlayer.position)
             self.playerManager.look(self.activePlayer)
 
     def leftKeyDown(self):
-
         if self.mode == 1:
             self.activePlayer = self.playerManager.changePlayer(-1)
             return
@@ -69,7 +65,6 @@ class eventHandler:
             self.activePlayer.moveLeft()
 
     def rightKeyDown(self):
-
         if self.mode == 1:
             self.activePlayer = self.playerManager.changePlayer(1)
             return
@@ -77,22 +72,18 @@ class eventHandler:
             self.activePlayer.moveRight()
 
     def upKeyDown(self):
-
         if self.mode == 1:
             return
         else:
             self.activePlayer.moveUp()
 
     def downKeyDown(self):
-
         if self.mode == 1:
             return
         else:
             self.activePlayer.moveDown()
 
     def spaceKeyDown(self):
-
-
         if self.activePlayer.position.y == 0:
             self.activePlayer = self.playerManager.getActivePlayer()
             self.activePlayer.chargeJump()
@@ -103,13 +94,11 @@ class eventHandler:
             del self.env.activeForcesDict['friction']
             self.playerManager.unsetForce(-1,'friction')
             print('turning Friction off')
-
         else:
             self.env.activeForcesList.append('friction')
             self.env.activeForcesDict.update({'friction':self.activePlayer.id})
             self.playerManager.setForce(-1,'friction')
             print('turning Friction On')
-
         print(self.env.activeForcesDict)
 
     def sKeyDown(self):
@@ -136,7 +125,6 @@ class eventHandler:
 
 
     def f1KeyDown(self):
-
         if self.mode == 0 or self.mode == 1:
             self.env.notPaused = not(self.env.notPaused)
             self.mode = not(self.mode)
@@ -165,18 +153,14 @@ class eventHandler:
                 print('Target Mode Set')
 
 ## Key Up Functions ##
-
     def handleKeyUp(self, evt ):
-
         if evt.key == " ":
             self.spaceKeyUp()
 
     def spaceKeyUp(self):
         self.playerManager.jump_on_keyup(self.env, self.activePlayer)
 
-
     def handleClick(self,evt):
-
         if self.mode == 0:
             print ('click @', evt.pos)
             self.playerManager.createPlayer_Click(evt.pos, self.env)

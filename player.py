@@ -3,10 +3,7 @@ from particle import *
 from random import randint
 
 class player(particle):
-
-
     def __init__(self, position = 'none', id = 'none'):
-
         self.dt = .05
         particle.__init__(self, position, id )
         self.type = 'player'
@@ -16,7 +13,6 @@ class player(particle):
         self.bottom = -2
         self.rollEnable = True
         self.boundaryList = []
-
         self.maxSpeed     = 15
         # Max speed in 2D is sqrt(2) * 15
         self.collision_history = list()
@@ -59,7 +55,6 @@ class player(particle):
 
         if len(self.collision_history) >= 5:
             self.collision_history.pop()
-
         self.collision_history.insert(0,[time,with_player_id])
 
     def setTimeResolution(self, newDt):
@@ -96,9 +91,3 @@ class player(particle):
             return jumpCharge.y
         else:
             return 0
-
-
-
-
-
-
