@@ -111,31 +111,24 @@ class playerManager:
     def createPlayer_Click(self, position, envObj):
         newPlayerPosition   = vector()
         newPlayerPosition   = position
-
         if newPlayerPosition.x < -50:
-            newPlayerPosition.x = -50
+            newPlayerPosition.x = -45
         if newPlayerPosition.x > 50:
-            newPlayerPosition.x = 50
-
+            newPlayerPosition.x = 45
         if newPlayerPosition.z < -19:
-            newPlayerPosition.z = -19
+            newPlayerPosition.z = -15
         if newPlayerPosition.z > 19:
-            newPlayerPosition.z = 19
-
+            newPlayerPosition.z = 15
         newPlayer = self.createPlayer( newPlayerPosition )
         self.buildPlayers(sphere(radius = 2, color = color.red ), vector(0,-6,0), materials.wood, newPlayer.getID() )
         newPlayer.updatePosition()
         newPlayer.setAcceleration(vector(0,-9.81,0))
-
         id = newPlayer.getID()      ## Use PlayerID to generate a new color
         colorID = id  - 3              ## StartGenerating colors from ID 1
-
         newColor   =  [int(x) for x in bin(colorID)[2:]]
-
         if( len(newColor) <= 3):
             while len(newColor) < 3:
                 newColor.append(0)
-
         print(newColor)
         newPlayer.mass = 80
 

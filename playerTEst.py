@@ -25,7 +25,7 @@ class enviornment:
         self.activeForcesList    = list()
         self.arena_boundary      = list()  #Walls, floor and ceiling
         self.forceFuncDict       = {'friction':self.friction}
-        self.uFric = .10
+        self.uFric = -.05
         self.centerOfMass        = vector()
         self.playerMgr           = playerManager()
         self.playerMgr.envObj    = self
@@ -52,7 +52,7 @@ class enviornment:
         self.playerMgr.buildPlayers(sphere(radius = 2, color = color.blue, opacity = 1 ), vector(0,-6,0), materials.wood, 1)
         self.playerMgr.buildPlayers(sphere(radius = 2, color = color.green, opacity = 1 ), vector(0,-6,0), materials.wood, 2)
         self.playerMgr.buildPlayers(sphere(radius = 2, color = (.996,.616,.016), opacity = 1), vector(0,-6, 0), materials.wood, 3)
-        self.playerMgr.setPlayerMass(20)
+        self.playerMgr.setPlayerMass(80)
 
 ## Other Player Attributes
         self.floor1    = flr(self.playerMgr.getPlayerBottom(0))
@@ -72,6 +72,7 @@ class enviornment:
         self.ARENA_BOUNDARY_KEY    = self.collisionTest1.addSet(self.arena_boundary)
 
         self.randomWalk = randomWalk(1,self, self.playerMgr,.5)
+
     def run(self):
         self.randomWalk.start()
         while True:

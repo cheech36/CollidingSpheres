@@ -210,8 +210,8 @@ class CollisionMonitor:
         #This should be true only for an invalid collision
         if(u1_vec.dot(rNorselfvec) >= 0 and u2_vec.dot(rNorselfvec) <= 0):
             print('Entangled')
-            tol  = .05
-            rpen = mag(r1Norm - r2Norm)
+            tol  = .5   # Previously .05
+            rpen = 4 - mag(r1Norm - r2Norm)
             dr1  = (rpen + tol)*rNorselfvec.norm()
             dr2  = (rpen + tol)*-rNorselfvec.norm()
             #Now check to make sure the 2 balls are not moving through another object
@@ -219,8 +219,9 @@ class CollisionMonitor:
             hold_Y = 0
             obstacles = self.interactingSets[self.OBS_KEY]
             for obs in obstacles:
-                   hold_X += obs.check(objX)
-                   hold_Y += obs.check(objY)
+                   if obs.gettype != 0: #Leave out the ceiling
+                       hold_X += obs.check(objX)
+                       hold_Y += obs.check(objY)
             #Now displace each player to disentangle them
             print('Disentangling')
             if not(hold_X):
