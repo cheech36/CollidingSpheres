@@ -209,36 +209,36 @@ class CollisionMonitor:
         elapsed_time = time.time() - self.start_time
         #This should be true only for an invalid collision
         if(u1_vec.dot(rNorselfvec) >= 0 and u2_vec.dot(rNorselfvec) <= 0):
-            #print('Entangled')
-            tol  = .5   # Previously .05
+            print('Entangled')
+            tol  = .02   # Previously .05
             dv   = 2
             rpen = 4 - mag(r1Norm - r2Norm)
             dr1  = (rpen + tol)*rNorselfvec.norm()
             dr2  = (rpen + tol)*-rNorselfvec.norm()
-            dv1  = 5*rNorselfvec.norm()
-            dv2  = -5*rNorselfvec.norm()
+            #dv1  = 5*rNorselfvec.norm()
+            #dv2  = -5*rNorselfvec.norm()
             #Now check to make sure the 2 balls are not moving through another object
             hold_X = 0
             hold_Y = 0
             obstacles = self.interactingSets[self.OBS_KEY]
             for obs in obstacles:
-                   if obs.gettype != 0: #Leave out the ceiling
+                   if obs.gettype() != 0: #Leave out the ceiling
                        hold_X += obs.check(objX)
                        hold_Y += obs.check(objY)
             #Now displace each player to disentangle them
-            #print('Disentangling')
+            print('Disentangling')
             if not(hold_X):
                 objX.changePosition(dr1)
-                v1_vec += dv1
+                #v1_vec += dv1
             else:
                 pass
-                #print('Cant move X')
+                print('Cant move X')
             if not(hold_Y):
                 objY.changePosition(dr2)
-                v2_vec += dv2
+                #v2_vec += dv2
             else:
                 pass
-                #print('Cant move Y')
+                print('Cant move Y')
         objX.on_collision(elapsed_time, objY.getID())
         objY.on_collision(elapsed_time, objX.getID())
         objX.setVelocity(v1_vec)
