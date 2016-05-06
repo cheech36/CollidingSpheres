@@ -1,5 +1,7 @@
 from visual import*
 from player import*
+import numpy as np
+
 class eventHandler:
     def __init__(self , envObj):
         self.env          =  envObj
@@ -9,6 +11,9 @@ class eventHandler:
         self.env.scene1.bind('keydown', self.handleKeyDown )
         self.env.scene1.bind('keyup'  , self.handleKeyUp   )
         self.env.scene1.bind('click'  , self.handleClick   )
+
+        self.forward = self.env.scene1.forward
+        print(self.forward)
 
     def handleKeyDown(self, evt ):
         if evt.key == 'left':
@@ -62,26 +67,36 @@ class eventHandler:
             self.activePlayer = self.playerManager.changePlayer(-1)
             return
         else:
-            self.activePlayer.moveLeft()
+
+            forward = self.forward
+            forward[1] = 0 # set y value to 0
+            left = 2*rotate(forward.norm(), angle = pi/2, axis = (0,1,0))
+            self.activePlayer.moveLeft(left)
 
     def rightKeyDown(self):
         if self.mode == 1:
             self.activePlayer = self.playerManager.changePlayer(1)
             return
         else:
-            self.activePlayer.moveRight()
+            forward = self.forward
+            forward[1] = 0 # set y value to 0
+            right = 2*rotate(forward.norm(), angle = -pi/2, axis = (0,1,0))
+            self.activePlayer.moveRight(right)
 
     def upKeyDown(self):
         if self.mode == 1:
             return
         else:
-            self.activePlayer.moveUp()
-
+            forward = self.forward
+            forward[1] = 0 # set y value to 0
+            self.activePlayer.moveUp(2*forward.norm())
     def downKeyDown(self):
         if self.mode == 1:
             return
         else:
-            self.activePlayer.moveDown()
+            backward = -self.forward
+            backward[1] = 0 # set y value to 0
+            self.activePlayer.moveDown(2*backward.norm())
 
     def spaceKeyDown(self):
         if self.activePlayer.position.y == 0:

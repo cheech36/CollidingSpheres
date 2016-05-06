@@ -98,32 +98,32 @@ class particle:
     def getForcesList(self):
         return self.forcesList
 
-    def moveRight(self):
+    def moveRight(self, dv_relative = vector(2,0,0)):
         initialSpeed = self.getVelocity().x
         finalSpeed   =  self.getVelocity().x + 2
         if self.position.y == 0 and (self.getVelocity().x < self.maxSpeed or finalSpeed < initialSpeed):
-            self.changeVelocity( (2,0,0 ) )
+            self.changeVelocity( dv_relative )
 
     def getType(self):
         return self.type
 
-    def moveLeft(self):
+    def moveLeft(self, dv_relative = vector(-2,0,0)):
         initialSpeed = self.getVelocity().x
         finalSpeed   =  self.getVelocity().x + -2
         if self.position.y == 0 and (self.getVelocity().x > -self.maxSpeed or finalSpeed > initialSpeed):
-            self.changeVelocity( (-2,0,0 ) )
+            self.changeVelocity( dv_relative )
 
-    def moveUp(self):
+    def moveUp(self, dv_relative = vector(0,0,-2)):
         initialSpeed = self.getVelocity().z
         finalSpeed   =  self.getVelocity().z + -2
         if self.position.y == 0 and (self.getVelocity().z > -self.maxSpeed or finalSpeed > initialSpeed):
-            self.changeVelocity( (0,0,-2 ) )
+            self.changeVelocity( dv_relative )
 
-    def moveDown(self):
+    def moveDown(self, dv_relative = vector(0,0,2)):
         initialSpeed = self.getVelocity().z
         finalSpeed   =  self.getVelocity().z + 2
         if self.position.y == 0 and (self.getVelocity().z < self.maxSpeed or finalSpeed < initialSpeed):
-            self.changeVelocity( (0,0,2 ) )
+            self.changeVelocity( dv_relative )
 
     def getOrigin(self):
         return vector(self.origin)
