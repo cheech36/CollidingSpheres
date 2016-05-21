@@ -68,7 +68,8 @@ class playerManager:
         for player in self.activePlayers:
             player.fullRender()
             player.updateVelocity()
-            player.roll()                   ## Assumes player is a sphere, need to add player flag 'rollEnabled'
+            player.roll()
+            player.age()                   ## Assumes player is a sphere, need to add player flag 'rollEnabled'
 
     def setPlayerBottom(self, yValue):
         for player in self.activePlayers:

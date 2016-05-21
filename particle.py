@@ -24,6 +24,7 @@ class particle:
  
         self.body         = sphere(pos=vector(0,0,0), radius = 0)                ## any simple shape
         self.origin       = vector(position)
+        self.inc          = 0
 
     def getPosition(self):
         return self.position
@@ -67,7 +68,7 @@ class particle:
     def changeForce(self, newForce):
         self.netForce += newForce
 
-    def setForce(_m, newForce):
+    def setForce(self, newForce):
         self.netForce = newForce
 
     def getEnergy(self):
@@ -84,10 +85,11 @@ class particle:
         return self.id
 
     def age(self):
-        self.time += dt
+        self.time += self.dt
+        self.inc  += 1
 
     def getAge(self):
-        return self.time
+        return self.time, self.inc
 
     def addForce(self, forceName):
         self.forcesList.append(forceName)
