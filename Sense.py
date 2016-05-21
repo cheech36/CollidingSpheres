@@ -14,10 +14,10 @@ class sense:
         self.dt = 1
         # Used only for visualization of net, not for detection.
         self.net_visual_display = list()
-        self.net_visible_f = False
-#        self.net_visible_f = True
+#        self.net_visible_f = False
+        self.net_visible_f = True
+        self.blank_image = 0
         self.net = self.formNet(scope)
-        self.blank_image = None
         self.image = None
 
     def formNet(self, scope):
