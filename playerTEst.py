@@ -42,7 +42,7 @@ class enviornment:
         self.Walker2 = self.playerMgr.createPlayer(vector(5, 0,  5))
 
         self.playerMgr.setPlayerBottom(-8)
-        self.playerMgr.setAsWalker(self.SmartyPants)
+#        self.playerMgr.setAsWalker(self.SmartyPants)
         self.playerMgr.setAsWalker(self.Walker0)
         self.playerMgr.setAsWalker(self.Walker1)
         self.playerMgr.setAsWalker(self.Walker2)
