@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from traits.trait_base import Self
+#from traits.trait_base import Self
 
 class NeuralBrain: # each input neuron has 2 columns and we'll add-ish them together
   DEFINE_num_output_classes = 2; # 1 for jump, #2 for not jump

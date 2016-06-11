@@ -25,7 +25,7 @@ class enviornment:
         self.activeForcesList    = list()
         self.arena_boundary      = list()  #Walls, floor and ceiling
         self.forceFuncDict       = {'friction':self.friction}
-        self.uFric = -.05
+        self.uFric = .05
         self.centerOfMass        = vector()
         self.playerMgr           = playerManager()
         self.playerMgr.envObj    = self
@@ -38,20 +38,20 @@ class enviornment:
         self.SmartyPants = self.playerMgr.createSmartPlayer(vector(20, 0,0))
         print('Active player is: ', self.SmartyPants.getID())
         self.Walker0 = self.playerMgr.createPlayer(vector(-10, 0,  0))
-        self.Walker1 = self.playerMgr.createPlayer(vector(5, 0,  0))
-        self.Walker2 = self.playerMgr.createPlayer(vector(5, 0,  5))
+        #self.Walker1 = self.playerMgr.createPlayer(vector(5, 0,  0))
+        #self.Walker2 = self.playerMgr.createPlayer(vector(5, 0,  5))
 
         self.playerMgr.setPlayerBottom(-8)
 #        self.playerMgr.setAsWalker(self.SmartyPants)
         self.playerMgr.setAsWalker(self.Walker0)
-        self.playerMgr.setAsWalker(self.Walker1)
-        self.playerMgr.setAsWalker(self.Walker2)
+        #self.playerMgr.setAsWalker(self.Walker1)
+        #self.playerMgr.setAsWalker(self.Walker2)
 
 ## Other Player Attributes
         self.playerMgr.buildPlayers(sphere(radius = 2, color = color.cyan, opacity = 1  ), vector(0,-6,0), materials.wood, 0)
         self.playerMgr.buildPlayers(sphere(radius = 2, color = color.blue, opacity = 1 ), vector(0,-6,0), materials.wood, 1)
-        self.playerMgr.buildPlayers(sphere(radius = 2, color = color.green, opacity = 1 ), vector(0,-6,0), materials.wood, 2)
-        self.playerMgr.buildPlayers(sphere(radius = 2, color = (.996,.616,.016), opacity = 1), vector(0,-6, 0), materials.wood, 3)
+        #self.playerMgr.buildPlayers(sphere(radius = 2, color = color.green, opacity = 1 ), vector(0,-6,0), materials.wood, 2)
+        #self.playerMgr.buildPlayers(sphere(radius = 2, color = (.996,.616,.016), opacity = 1), vector(0,-6, 0), materials.wood, 3)
         self.playerMgr.setPlayerMass(80)
 
 ## Other Player Attributes
@@ -74,7 +74,7 @@ class enviornment:
         self.randomWalk = randomWalk(1,self, self.playerMgr,.5)
 
     def run(self):
-        self.randomWalk.start()
+        #self.randomWalk.start()
         while True:
             rate(self.rate)
             while self.notPaused:
@@ -99,16 +99,6 @@ class enviornment:
             player.velocity.z -=  (self.globalDt * self.uFric * player.velocity.norm().z)
             if mag(vector(player.velocity.z, 0, 0)) < player.restThreshold:
                 player.velocity.z = 0
-
-    def walls(self):
-        for player in self.playerMgr.activePlayers:
-            if player.getPosition().x <= -50 or player.getPosition().x >= 50:
-                vx = player.getVelocity().x
-                player.changeVelocity(vector(-2*vx,0,0 ))
-
-            if player.getPosition().z <= -20 or player.getPosition().z >= 20:
-                vz = player.getVelocity().z
-                player.changeVelocity(vector(0,0,-2*vz))
 
     def addForce(self, newForce , newPlayerID ):
         self.activeForcesList.append(newForce)
