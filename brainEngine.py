@@ -5,8 +5,48 @@ from array import array
 from Sense import *
 from NeuralBrain import *
 
+# Valid status keys
+NULL = np.array([False, False, False, False], dtype=bool)
+STREAM = np.array([True, False, False, False], dtype=bool)
+FEED = np.array([False, True, False, False], dtype=bool)
+TRIGGER = np.array([False, False, True, False], dtype=bool)
+LOCKOUT = np.array([False, False, False, True], dtype=bool)
+
+class Gate:
+    def __init__(self, capacity = 5):
+        self.status = np.array([False, False, False, False], dtype=bool)
+        self.stream_capacity = 5
+        self.stream_size = 0
+    def __check__(self, key):
+        index = np.where(key == True)[0][0]
+        return self.status[index]
+    def stream_full(self):
+        return (self.stream_size >= self.stream_capacity)
+    def add(self, key):
+        self.status +=  key
+    def remove(self, key):
+        index_to_subtract = np.where(key == True)[0][0]
+        self.status[index_to_subtract] = False
+    def stream(self):
+        return self.__check__(STREAM)
+    def reset_stream(self):
+        self.stream_size = 0
+    def feed(self):
+        return self.__check__(FEED)
+    def trigger(self):
+        return self.__check__(TRIGGER)
+    def lock(self):
+        return self.__check__(LOCKOUT)
+    def open(self):
+        return not(self.__check__(LOCKOUT))
+    def increment(self):
+        self.stream_size += 1
+        return self.stream_size
+
+
 class brainEngine (threading.Thread):
     playerManager = None
+
     def __init__(self, player1, sleep):
         threading.Thread.__init__(self)
         self.player = player1
@@ -18,19 +58,15 @@ class brainEngine (threading.Thread):
         self.position = self.player.position
         self.playerID = self.player.getID()
 
-
         self.image_old = np.zeros((self.scope_x,self.scope_z), dtype= int)
         self.image_sum = np.zeros((self.scope_x,self.scope_z), dtype= int)
 
-        self.stream_size = 0
-        self.image_stream = False
-        self.image_feed = False
-        self.image_trig = False
-        self.collision  = False
-        self.lockout_flag = False
+        # Status Flags stream,feed,trig,collision,lockout
+        # Set Max stream size to 6 images
+        self.gate = Gate(6)
 
+        # Make the bain
         self.myBrain = NeuralBrain("NeuralModel_Logit_1Hl-n50_2Outputs", self.scope_x*self.scope_z, 1, 50);
-        # minibatch size=1, with 50 hidden neurons (hard-coded 1-layer only so far)
         self.myBrain.loadPersistentModel();
 
 
@@ -38,89 +74,83 @@ class brainEngine (threading.Thread):
         listqueue = [];
         while True:
             buffer = np.array(self.sense.look(self.position), dtype=int)
-
             if (len(self.player.collision_history) > 0):
                 collision_data = self.player.collision_history.pop()
                 collision_time = collision_data[0]
                 other_player = collision_data[1]
                 print(' collision at: ', collision_time, 'between', self.playerID, ' and ', other_player)
 
-                print('Feeding Forward, Stream Size= ', self.stream_size)
-                self.image_feed = False
-                # for row in self.image_sum.tolist():
-                #print('Image Sum\n', self.image_sum)
-                inputneurons = self.image_sum.reshape((1, self.scope_x * self.scope_z)) / self.stream_size;
-                #print('Input Neurons\n', inputneurons)
-                self.train_data = np.array(inputneurons)
-                followinstinct = self.myBrain.feedForwardOnly(inputneurons);
-                print('Instinct is: ', followinstinct)
-                self.stream_size = 0
-                self.lockout_flag = True
-                self.image_stream = False
-                self.image_feed = False
+                if (self.gate.open()):
+                    followinstinct = self.feed()
 
+                self.gate.add(LOCKOUT)
 
-
-
-            if(not(self.lockout_flag)):
+            if( self.gate.open() ):
                 image_new = buffer
 
                 if (self.image_old.any() != image_new.any()):
-                    ## Either begin or the end of a stream
+                # Detect Beginning or end of stream
                     if( self.image_old.any() ):
-                        ## Then the stream must be ending
-                        self.image_stream = False
-                        self.image_feed = True
+                        self.gate.remove(STREAM)
+                        self.gate.add(FEED)
                         print('Ending Stream')
                     elif( image_new.any() ):
-                        ## The stream must be beginning
-                        self.image_stream = True
+                        self.gate.add(STREAM)
                         print('Starting Stream')
-                if(self.image_stream):
+
+                if(self.gate.stream() and not(self.gate.stream_full()) ):
                     self.image_sum += image_new
-                    self.stream_size += 1
-                    #print(image_new.any())
+                    self.gate.increment()
 
                 self.image_old = image_new
-                if( self.image_feed or self.stream_size > 5):
 
-                    if(self.stream_size > 5):
-                        self.image_stream = False
+                if( self.gate.feed() or self.gate.stream_full()):
+                    self.gate.add(LOCKOUT)
+                    if(self.gate.stream_full()):
                         print('Stream is Full')
-                        self.lockout_flag = True
                     else:
-                        print('stream not full ', self.stream_size)
+                        print('stream not full ', self.gate.stream_size)
 
-                    print('Feeding Forward')
-                    self.image_feed = False
-                    #for row in self.image_sum.tolist():
-                    print(self.image_sum)
-                    inputneurons = self.image_sum.reshape((1,self.scope_x*self.scope_z))/self.stream_size;
-                    #print(inputneurons)
-                    self.train_data = np.array(inputneurons)
-                    followinstinct = self.myBrain.feedForwardOnly(inputneurons);
-                    print('Instinct is: ', followinstinct)
-
+                    followinstinct = self.feed()
                     if (followinstinct[0] == 'jump'):
                         self.player.chargeJump()
                         self.playerManager.jump(self.player)
 
+                    self.gate.reset_stream()
             time.sleep(self.SLEEP)
 
 
     def train(self, label):
-        print(label, ' Made it to brain engine')
-        np_label = np.array(label)
-        train_label = np_label.reshape((1,2))
-        print(train_label)
 
-        #print('Image Sum\n', self.image_sum)
-        #print('Input Neurons\n', self.train_data)
+        #The stream should always be locked out after termination
+        #Termination can occur for 3 reasons
+        # a) Stream is full
+        # b) A collision has occured
+        # c) The other player has exited the scope boundary
+        if( self.gate.lock()):
+            print(label, ' Made it to brain engine')
+            np_label = np.array(label)
+            train_label = np_label.reshape((1,2))
+            print(train_label)
 
-        self.myBrain.trainAndSaveModel(self.train_data,train_label)
+            self.myBrain.trainAndSaveModel(self.train_data,train_label)
+            self.image_sum = np.zeros((self.scope_x, self.scope_z), dtype=int)
+            self.image_old = np.zeros((self.scope_x, self.scope_z), dtype=int)
+            self.stream_size = 0
+            self.gate.remove(LOCKOUT)
+            self.gate.remove(FEED)
+            self.gate.remove(STREAM)
 
-        self.image_sum = np.zeros((self.scope_x, self.scope_z), dtype=int)
-        self.image_old = np.zeros((self.scope_x, self.scope_z), dtype=int)
-        self.stream_size = 0
-        self.lockout_flag = False
-        self.image_feed = False
+        else:
+            print('No Stream Data')
+
+
+
+    def feed(self):
+            print('Feeding Forward, Stream Size= ', self.gate.stream_size)
+            self.gate.remove(FEED)
+            inputneurons = self.image_sum.reshape((1, self.scope_x * self.scope_z)) / self.gate.stream_size;
+            self.train_data = np.array(inputneurons)
+            followinstinct = self.myBrain.feedForwardOnly(inputneurons);
+            print(followinstinct)
+            return followinstinct
