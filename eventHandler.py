@@ -37,8 +37,8 @@ class eventHandler:
         if evt.key == 'f':     # Turn on friction
             self.fKeyDown()
 
-        if evt.key == 'r':     # Return to position
-            self.rKeyDown()
+        if evt.key == 'o':     # Return to position
+            self.oKeyDown()
 
         if evt.key == 'p':     # Print stats
             self.pKeyDown()
@@ -61,6 +61,12 @@ class eventHandler:
         if evt.key == 'l':      # Look  - Don't use
             print('Player is at: ', self.activePlayer.position)
             self.playerManager.look(self.activePlayer)
+
+        if evt.key == 'j':     # Manual Indicate - Right Decision
+            self.jKeyDown()
+
+        if evt.key == 'n':    # Manual Indicate - Wrong Decisions
+            self.nKeyDown()
 
     def leftKeyDown(self):
         if self.mode == 1:
@@ -120,9 +126,18 @@ class eventHandler:
 #        if self.activePlayer.position.y == 0:
             self.activePlayer.setVelocity(vector(0,0,0))
 
-    def rKeyDown(self):
+    def oKeyDown(self):
 ##       if self.activePlayer.position.y == 0:
             self.activePlayer.setPosition(vector(-5,0,0))
+
+
+    def jKeyDown(self):
+        print('Should Have Jumped')
+        self.playerManager.train([1,0])
+
+    def nKeyDown(self):
+        print('Should not have Jumped')
+        self.playerManager.train([0,1])
 
     def pKeyDown(self):
         self.activePlayer.print_stats()

@@ -195,3 +195,8 @@ class playerManager:
             print('Not Smart')
             return -1
 
+    def train(self, label):
+        self.trainee.train(label)
+
+    def set_as_trainee(self, trainee):
+        self.trainee = trainee

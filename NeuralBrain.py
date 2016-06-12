@@ -26,6 +26,7 @@ class NeuralBrain: # each input neuron has 2 columns and we'll add-ish them toge
        feed_dict = {self.tf_train_dataset : batch_data}
         
        train_prediction = self.tfsession.run([self.train_prediction], feed_dict=feed_dict);
+       print(train_prediction)
        if (train_prediction[0][0][0] > 0.5):
            return (["jump", train_prediction[0][0][0]]);
        elif (train_prediction[0][0][1] > 0.5):

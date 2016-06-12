@@ -22,3 +22,6 @@ class smartPlayer2 (player):
 
     def look(self):
         self.image1 = self.sense.look(self.position) 
+
+    def train(self, label):
+        self.brainEngine.train(label)
