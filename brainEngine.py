@@ -45,7 +45,7 @@ class brainEngine (threading.Thread):
                 other_player = collision_data[1]
                 print(' collision at: ', collision_time, 'between', self.playerID, ' and ', other_player)
 
-                print('Feeding Forward')
+                print('Feeding Forward, Stream Size= ', self.stream_size)
                 self.image_feed = False
                 # for row in self.image_sum.tolist():
                 #print('Image Sum\n', self.image_sum)
@@ -61,11 +61,13 @@ class brainEngine (threading.Thread):
 
 
 
+
             if(not(self.lockout_flag)):
                 image_new = buffer
+
                 if (self.image_old.any() != image_new.any()):
                     ## Either begin or the end of a stream
-                    if( self.image_old.any()):
+                    if( self.image_old.any() ):
                         ## Then the stream must be ending
                         self.image_stream = False
                         self.image_feed = True
@@ -80,7 +82,15 @@ class brainEngine (threading.Thread):
                     #print(image_new.any())
 
                 self.image_old = image_new
-                if( self.image_feed ):
+                if( self.image_feed or self.stream_size > 5):
+
+                    if(self.stream_size > 5):
+                        self.image_stream = False
+                        print('Stream is Full')
+                        self.lockout_flag = True
+                    else:
+                        print('stream not full ', self.stream_size)
+
                     print('Feeding Forward')
                     self.image_feed = False
                     #for row in self.image_sum.tolist():
@@ -94,11 +104,6 @@ class brainEngine (threading.Thread):
                     if (followinstinct[0] == 'jump'):
                         self.player.chargeJump()
                         self.playerManager.jump(self.player)
-
-
-
-
-
 
             time.sleep(self.SLEEP)
 

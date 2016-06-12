@@ -53,7 +53,9 @@ class enviornment:
         self.playerMgr.buildPlayers(sphere(radius = 2, color = color.blue, opacity = 1 ), vector(0,-6,0), materials.wood, 1)
         #self.playerMgr.buildPlayers(sphere(radius = 2, color = color.green, opacity = 1 ), vector(0,-6,0), materials.wood, 2)
         #self.playerMgr.buildPlayers(sphere(radius = 2, color = (.996,.616,.016), opacity = 1), vector(0,-6, 0), materials.wood, 3)
-        self.playerMgr.setPlayerMass(80)
+
+        self.SmartyPants.mass = 800
+        self.Walker0.mass = 2
 
 ## Other Player Attributes
         self.floor1    = flr(self.playerMgr.getPlayerBottom(0))

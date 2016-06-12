@@ -36,9 +36,9 @@ class playerManager:
             self.active = self.activePlayers[0]
         return newPlayer
 
-    def setPlayerMass(self, mass, id = 'none'):
+    def setPlayerMass(self, mass, id = 0):
         ##If no id is given set all player to this mass
-        if id == 'none':
+        if id == 0:
             for p in self.activePlayers:
                 p.mass = mass
         else:
@@ -125,12 +125,12 @@ class playerManager:
         newPlayer.updatePosition()
         newPlayer.setAcceleration(vector(0,-9.81,0))
         id = newPlayer.getID()      ## Use PlayerID to generate a new color
-        colorID = id  - 3              ## StartGenerating colors from ID 1
-        newColor   =  [int(x) for x in bin(colorID)[2:]]
-        if( len(newColor) <= 3):
-            while len(newColor) < 3:
-                newColor.append(0)
-        print(newColor)
+        #colorID = id  - 3              ## StartGenerating colors from ID 1
+        #newColor   =  [int(x) for x in bin(colorID)[2:]]
+        #if( len(newColor) <= 3):
+        #    while len(newColor) < 3:
+        #        newColor.append(0)
+        #print(newColor)
         newPlayer.mass = 80
 
     def applyForces(self,env):
