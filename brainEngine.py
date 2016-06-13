@@ -104,13 +104,10 @@ class brainEngine (threading.Thread):
                 self.image_old = image_new
                 if( self.gate.feed() or self.gate.stream_full()):
                     self.gate.add(LOCKOUT)
-
                     followinstinct = self.feed()
-                    if (followinstinct[0] == 'jump'):
-                        self.player.chargeJump()
-                        self.playerManager.jump(self.player)
-
+                    self.react(followinstinct)
                     self.gate.reset_stream()
+
             time.sleep(self.SLEEP)
 
 
@@ -144,8 +141,6 @@ class brainEngine (threading.Thread):
         else:
             print('No Stream Data')
 
-
-
     def feed(self):
             self.gate.remove(FEED)
             inputneurons = self.image_sum.reshape((1, self.scope_x * self.scope_z)) / self.gate.stream_size;
@@ -153,3 +148,9 @@ class brainEngine (threading.Thread):
             self.followinstinct = self.myBrain.feedForwardOnly(inputneurons);
             print('Response: ', self.followinstinct[0], 'Confidence: ', self.followinstinct[1])
             return self.followinstinct
+
+    def react(self, instinct):
+        if (instinct[0] == 'jump'):
+            self.player.chargeJump()
+            self.playerManager.jump(self.player)
+
