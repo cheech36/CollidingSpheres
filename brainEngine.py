@@ -59,6 +59,10 @@ class brainEngine (threading.Thread):
         self.playerID = self.player.getID()
         self.image_old = self.sense.blank()
         self.image_sum = self.sense.blank()
+        self.stream_count = 0
+        self.correct_response = 0
+        self.trainset = list()
+
         # Status Flags stream,feed,trig,collision,lockout
         # Set Max stream size to 6 images
         self.gate = Gate(6)
@@ -79,34 +83,27 @@ class brainEngine (threading.Thread):
 
                 if (self.gate.open()):
                     followinstinct = self.feed()
-
                 self.gate.add(LOCKOUT)
 
             if( self.gate.open() ):
                 image_new = buffer
-
                 if (self.image_old.any() != image_new.any()):
                 # Detect Beginning or end of stream
                     if( self.image_old.any() ):
                         self.gate.remove(STREAM)
                         self.gate.add(FEED)
-                        print('Ending Stream')
+
                     elif( image_new.any() ):
                         self.gate.add(STREAM)
-                        print('Starting Stream')
+                        print('Starting Stream: ', self.stream_count)
 
                 if(self.gate.stream() and not(self.gate.stream_full()) ):
                     self.image_sum += image_new
                     self.gate.increment()
 
                 self.image_old = image_new
-
                 if( self.gate.feed() or self.gate.stream_full()):
                     self.gate.add(LOCKOUT)
-                    if(self.gate.stream_full()):
-                        print('Stream is Full')
-                    else:
-                        print('stream not full ', self.gate.stream_size)
 
                     followinstinct = self.feed()
                     if (followinstinct[0] == 'jump'):
@@ -118,18 +115,19 @@ class brainEngine (threading.Thread):
 
 
     def train(self, label):
-
         #The stream should always be locked out after termination
         #Termination can occur for 3 reasons
         # a) Stream is full
         # b) A collision has occured
         # c) The other player has exited the scope boundary
         if( self.gate.lock()):
-            print(label, ' Made it to brain engine')
-            np_label = np.array(label)
-            train_label = np_label.reshape((1,2))
-            print(train_label)
+            if( label == 'jump'):
+                label_hot = [1,0]
+            elif( label == 'nojump'):
+                label_hot = [0,1]
 
+            np_label = np.array(label_hot)
+            train_label = np_label.reshape((1,2))
             self.myBrain.trainAndSaveModel(self.train_data,train_label)
             self.image_sum = self.sense.blank()
             self.image_old = self.sense.blank()
@@ -137,6 +135,11 @@ class brainEngine (threading.Thread):
             self.gate.remove(LOCKOUT)
             self.gate.remove(FEED)
             self.gate.remove(STREAM)
+            self.trainset.append([self.stream_count, label == self.followinstinct[0]])
+            self.correct_response += self.trainset[self.stream_count][1]
+            self.stream_count += 1
+            print('Train Label', label, 'Training Efficiency: ', self.correct_response / self.stream_count)
+            print("\n")
 
         else:
             print('No Stream Data')
@@ -144,10 +147,9 @@ class brainEngine (threading.Thread):
 
 
     def feed(self):
-            print('Feeding Forward, Stream Size= ', self.gate.stream_size)
             self.gate.remove(FEED)
             inputneurons = self.image_sum.reshape((1, self.scope_x * self.scope_z)) / self.gate.stream_size;
             self.train_data = np.array(inputneurons)
-            followinstinct = self.myBrain.feedForwardOnly(inputneurons);
-            print(followinstinct)
-            return followinstinct
+            self.followinstinct = self.myBrain.feedForwardOnly(inputneurons);
+            print('Response: ', self.followinstinct[0], 'Confidence: ', self.followinstinct[1])
+            return self.followinstinct

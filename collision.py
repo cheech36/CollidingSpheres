@@ -179,7 +179,7 @@ class CollisionMonitor:
        if(vel_norm == 1):
        #Bouncing vertically of a plane
            #Set to 0 to turn off bouncing
-           plr.getVelocity()[vel_norm] *= -.7
+           plr.getVelocity()[vel_norm] *= 0 #-.7
            # For some reason 2 this threshold needs to be ~ 2 or the balls continue to bounce
            if abs(plr.getVelocity()[vel_norm]) < 2:
                plr.getVelocity()[vel_norm] = 0

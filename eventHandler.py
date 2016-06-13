@@ -132,12 +132,10 @@ class eventHandler:
 
 
     def jKeyDown(self):
-        print('Should Have Jumped')
-        self.playerManager.train([1,0])
+        self.playerManager.train('jump')
 
     def nKeyDown(self):
-        print('Should not have Jumped')
-        self.playerManager.train([0,1])
+        self.playerManager.train('nojump')
 
     def pKeyDown(self):
         self.activePlayer.print_stats()
