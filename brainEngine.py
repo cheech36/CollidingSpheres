@@ -6,9 +6,9 @@ from Sense import *
 from NeuralBrain import *
 
 # Valid status keys
-NULL = np.array([False, False, False, False], dtype=bool)
-STREAM = np.array([True, False, False, False], dtype=bool)
-FEED = np.array([False, True, False, False], dtype=bool)
+NULL    = np.array([False, False, False, False], dtype=bool)
+STREAM  = np.array([True, False, False, False], dtype=bool)
+FEED    = np.array([False, True, False, False], dtype=bool)
 TRIGGER = np.array([False, False, True, False], dtype=bool)
 LOCKOUT = np.array([False, False, False, True], dtype=bool)
 
@@ -57,14 +57,11 @@ class brainEngine (threading.Thread):
         self.lastImage = False;
         self.position = self.player.position
         self.playerID = self.player.getID()
-
-        self.image_old = np.zeros((self.scope_x,self.scope_z), dtype= int)
-        self.image_sum = np.zeros((self.scope_x,self.scope_z), dtype= int)
-
+        self.image_old = self.sense.blank()
+        self.image_sum = self.sense.blank()
         # Status Flags stream,feed,trig,collision,lockout
         # Set Max stream size to 6 images
         self.gate = Gate(6)
-
         # Make the bain
         self.myBrain = NeuralBrain("NeuralModel_Logit_1Hl-n50_2Outputs", self.scope_x*self.scope_z, 1, 50);
         self.myBrain.loadPersistentModel();
@@ -73,7 +70,7 @@ class brainEngine (threading.Thread):
     def run(self):
         listqueue = [];
         while True:
-            buffer = np.array(self.sense.look(self.position), dtype=int)
+            buffer = self.sense.look(self.position)
             if (len(self.player.collision_history) > 0):
                 collision_data = self.player.collision_history.pop()
                 collision_time = collision_data[0]
@@ -134,8 +131,8 @@ class brainEngine (threading.Thread):
             print(train_label)
 
             self.myBrain.trainAndSaveModel(self.train_data,train_label)
-            self.image_sum = np.zeros((self.scope_x, self.scope_z), dtype=int)
-            self.image_old = np.zeros((self.scope_x, self.scope_z), dtype=int)
+            self.image_sum = self.sense.blank()
+            self.image_old = self.sense.blank()
             self.stream_size = 0
             self.gate.remove(LOCKOUT)
             self.gate.remove(FEED)
