@@ -87,3 +87,6 @@ class sense:
 
     def blank(self):
         return self.blank_image.copy()
+
+
+

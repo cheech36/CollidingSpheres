@@ -17,6 +17,7 @@ class playerManager:
         self.nonZero_FNet_ID = list()
         self.listOfWalkers = list()
         aabb.playerManager = self ## Register with aabb collision class
+        bs.playerManager   = self
         brainEngine.playerManager = self # Register with Brain Engine Class
 
     def createPlayer(self, position = vector):
@@ -131,7 +132,7 @@ class playerManager:
         #    while len(newColor) < 3:
         #        newColor.append(0)
         #print(newColor)
-        newPlayer.mass = 80
+        newPlayer.mass = 2
 
     def applyForces(self,env):
         if len(self.nonZero_FNet_ID) != 0:    ##Call all active Forces

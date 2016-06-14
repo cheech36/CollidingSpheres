@@ -91,8 +91,29 @@ class aabb:
 
 # Bounding Sphere Class
 class bs:
-    def __init__(self, interactingSets):
-        pass
+    playerManager = None
+    def __init__(self, id, position, radius=2 ):
+        self.position = position
+        self.radius   = radius
+        self.playerID = id
+
+    def contains_players(self, player_position, player_radius = 2):
+        disp = player_position - self.position
+        distance = mag(disp)
+        dist_min = self.radius + player_radius
+        if(distance <= dist_min):
+            return True
+        else:
+            return False
+
+    def check_for_players(self):
+        for incomingPlayer in self.playerManager.activePlayers:
+            id = incomingPlayer.getID()
+            #Make sure the player does not collide with itself
+            if(self.contains_players(incomingPlayer.getPosition()) and (id != self.playerID)):
+                return True
+        return False
+
 
 # Bounding Plane
 class bp:

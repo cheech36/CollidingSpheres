@@ -1,6 +1,7 @@
 from __future__ import print_function
 from __future__ import division
 from visual import *
+import wx
 from eventHandler import *
 from player import *
 from eventHandler import *

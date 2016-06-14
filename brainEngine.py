@@ -4,6 +4,8 @@ import numpy as np
 from array import array
 from Sense import *
 from NeuralBrain import *
+from visual.graph import *
+import matplotlib.pyplot as plt
 
 # Valid status keys
 NULL    = np.array([False, False, False, False], dtype=bool)
@@ -15,8 +17,11 @@ LOCKOUT = np.array([False, False, False, True], dtype=bool)
 class Gate:
     def __init__(self, capacity = 5):
         self.status = np.array([False, False, False, False], dtype=bool)
-        self.stream_capacity = 5
+        self.stream_capacity = capacity
         self.stream_size = 0
+        self.test_boundary = False
+        self.display_graph = False
+        self.display_plot  = False
     def __check__(self, key):
         index = np.where(key == True)[0][0]
         return self.status[index]
@@ -65,7 +70,13 @@ class brainEngine (threading.Thread):
 
         # Status Flags stream,feed,trig,collision,lockout
         # Set Max stream size to 6 images
-        self.gate = Gate(6)
+        self.gate = Gate(10)
+
+        self.gate.display_graph = False
+        self.gate.display_plot  = True
+        if(self.gate.display_graph):
+            self.train_graph = gcurve(color=color.cyan)
+
         # Make the bain
         self.myBrain = NeuralBrain("NeuralModel_Logit_1Hl-n50_2Outputs", self.scope_x*self.scope_z, 1, 50);
         self.myBrain.loadPersistentModel();
@@ -83,6 +94,7 @@ class brainEngine (threading.Thread):
 
                 if (self.gate.open()):
                     followinstinct = self.feed()
+                    self.react(followinstinct)
                 self.gate.add(LOCKOUT)
 
             if( self.gate.open() ):
@@ -95,6 +107,9 @@ class brainEngine (threading.Thread):
 
                     elif( image_new.any() ):
                         self.gate.add(STREAM)
+                        if(self.gate.test_boundary):
+                            print('Did Not Need to jump 1')
+                            self.gate.test_boundary = False
                         print('Starting Stream: ', self.stream_count)
 
                 if(self.gate.stream() and not(self.gate.stream_full()) ):
@@ -107,6 +122,15 @@ class brainEngine (threading.Thread):
                     followinstinct = self.feed()
                     self.react(followinstinct)
                     self.gate.reset_stream()
+
+
+            if(self.gate.test_boundary):
+                self.should_have_jumped = self.check_test_boundary()
+                # Where the ball would be if it had not jumped
+                if(self.should_have_jumped):
+                    print('Should have jumped')
+                    self.gate.test_boundary = False
+
 
             time.sleep(self.SLEEP)
 
@@ -126,6 +150,7 @@ class brainEngine (threading.Thread):
             np_label = np.array(label_hot)
             train_label = np_label.reshape((1,2))
             self.myBrain.trainAndSaveModel(self.train_data,train_label)
+            #print(self.image_sum)
             self.image_sum = self.sense.blank()
             self.image_old = self.sense.blank()
             self.stream_size = 0
@@ -135,7 +160,10 @@ class brainEngine (threading.Thread):
             self.trainset.append([self.stream_count, label == self.followinstinct[0]])
             self.correct_response += self.trainset[self.stream_count][1]
             self.stream_count += 1
-            print('Train Label', label, 'Training Efficiency: ', self.correct_response / self.stream_count)
+            accuaracy = self.correct_response / self.stream_count
+            print('Train Label', label, 'Training Efficiency: ', accuaracy )
+            if(self.gate.display_graph):
+                self.train_graph.plot(pos=(self.stream_count,accuaracy))
             print("\n")
 
         else:
@@ -143,7 +171,11 @@ class brainEngine (threading.Thread):
 
     def feed(self):
             self.gate.remove(FEED)
-            inputneurons = self.image_sum.reshape((1, self.scope_x * self.scope_z)) / self.gate.stream_size;
+            if(self.gate.display_plot):
+                plt.imshow(self.image_sum, interpolation='nearest')
+            N = self.image_sum.sum()
+            inputneurons = self.image_sum.reshape((1, self.scope_x * self.scope_z)) / N
+            #print(inputneurons)
             self.train_data = np.array(inputneurons)
             self.followinstinct = self.myBrain.feedForwardOnly(inputneurons);
             print('Response: ', self.followinstinct[0], 'Confidence: ', self.followinstinct[1])
@@ -153,4 +185,18 @@ class brainEngine (threading.Thread):
         if (instinct[0] == 'jump'):
             self.player.chargeJump()
             self.playerManager.jump(self.player)
+            self.drop_test_boundary(self.position)
 
+    def drop_test_boundary(self, position):
+        # Must create a test sphere where the ball would be if it had not jumped.
+        # To do this must project the current position of  ball on to floor, however a copy will not work for this,
+        # must use a reference to current position
+        # Revisit this
+
+        self.test_sphere = bs(self.playerID,vector(self.position),2)
+        self.gate.test_boundary = True
+
+
+    def check_test_boundary(self):
+        #Need to pass the projected position of the ball on each call, add a parameter for this
+        hit =  self.test_sphere.check_for_players()

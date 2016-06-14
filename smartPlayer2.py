@@ -10,11 +10,11 @@ class smartPlayer2 (player):
         player.__init__(self, position, id)
         self.type = 'smartPlayer'
         self.target = vector(0,0)
-        self.scope = (10,10,10)
+        self.scope = (7, 7, 7)
         self.sense = sense(id, position, self.scope)
         self.image1 = self.sense.blank_image
         
-        self.brainEngine = brainEngine(self, .10)
+        self.brainEngine = brainEngine(self, .05)
         self.brainEngine.start()
         
     def getType(self):
