@@ -14,6 +14,20 @@ from smartPlayer import *
 import threading
 import time
 
+### Matplotlib
+import matplotlib
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_wxagg import Toolbar, FigureCanvasWxAgg
+from matplotlib.figure import Figure
+
+
+class gui_manager:
+    def __init__(self, log=None, graph=None):
+        self.log = log
+        self.graph = graph
+
+
+
 class enviornment:
 
     def __init__(self):
@@ -30,50 +44,18 @@ class enviornment:
         self.centerOfMass        = vector()
         self.playerMgr           = playerManager()
         self.playerMgr.envObj    = self
-        self.scene1 = display(x=0, y=0, width=1200, height = 600)
-        self.scene1.autoscale = False
-        self.scene1.title = 'SphereLand Lab Frame'
-        self.scene1.range = (30,10,5)
-        self.playerMgr.scene( self.scene1)
 
-        self.SmartyPants = self.playerMgr.createSmartPlayer(vector(20, 0,0))
-        self.playerMgr.set_as_trainee(self.SmartyPants)
-        print('Active player is: ', self.SmartyPants.getID())
-        self.Walker0 = self.playerMgr.createPlayer(vector(-10, 0,  0))
-        #self.Walker1 = self.playerMgr.createPlayer(vector(5, 0,  0))
-        #self.Walker2 = self.playerMgr.createPlayer(vector(5, 0,  5))
 
-        self.playerMgr.setPlayerBottom(-8)
-#        self.playerMgr.setAsWalker(self.SmartyPants)
-        self.playerMgr.setAsWalker(self.Walker0)
-        #self.playerMgr.setAsWalker(self.Walker1)
-        #self.playerMgr.setAsWalker(self.Walker2)clear
+
+        self.gui = gui_manager()
+        self.init_gui()
+        self.playerMgr.scene( self.scene1 )
+        self.init_players()
+        self.init_arena()
+
 
 ## Other Player Attributes
-        self.playerMgr.buildPlayers(sphere(radius = 2, color = color.red, opacity = 1  ), vector(0,-6,0), materials.wood, 0)
-        self.playerMgr.buildPlayers(sphere(radius = 2, color = color.green, opacity = 1 ), vector(0,-6,0), materials.wood, 1)
-        #self.playerMgr.buildPlayers(sphere(radius = 2, color = color.green, opacity = 1 ), vector(0,-6,0), materials.wood, 2)
-        #self.playerMgr.buildPlayers(sphere(radius = 2, color = (.996,.616,.016), opacity = 1), vector(0,-6, 0), materials.wood, 3)
 
-        self.SmartyPants.mass = 800
-        self.Walker0.mass = 2
-
-## Other Player Attributes
-        self.floor1    = flr(self.playerMgr.getPlayerBottom(0))
-        self.ceiling   = bp('y', .05, 'pos')
-        self.frontWall = obstacle((0,     -6.75, -23)  ,(110, 0,  0),2.5, 3, bp('z', -20,'neg'))
-        self.backWall = obstacle ((0,     -6.75,  23)  ,(110, 0,  0),2.5, 3, bp('z',  20,'pos'))
-        self.leftWall = obstacle ((-53.5, -6.75,   0)  ,(0,   0, 44),2.5, 3, bp('x', -50,'neg'))
-        self.rightWall = obstacle((53.5,  -6.75,   0)  ,(0,   0, 44),2.5, 3, bp('x',  50,'pos'))
-        self.arena_boundary.append(self.floor1)
-        self.arena_boundary.append(self.ceiling)
-        self.arena_boundary.append(self.frontWall)
-        self.arena_boundary.append(self.backWall)
-        self.arena_boundary.append(self.leftWall)
-        self.arena_boundary.append(self.rightWall)
-        self.collisionTest1 = CollisionMonitor()
-        self.PLAYERS_COLLISION_KEY = self.collisionTest1.addSet(self.playerMgr.activePlayers)
-        self.ARENA_BOUNDARY_KEY    = self.collisionTest1.addSet(self.arena_boundary)
 
         self.randomWalk = randomWalk(1,self, self.playerMgr,.5)
 
@@ -108,6 +90,78 @@ class enviornment:
         self.activeForcesList.append(newForce)
         self.activeForcesDict.update({newForce: newPlayerID})
 
+
+    def init_players(self):
+        self.SmartyPants = self.playerMgr.createSmartPlayer(vector(20, 0, 0))
+        self.playerMgr.set_as_trainee(self.SmartyPants)
+        print('Active player is: ', self.SmartyPants.getID())
+        self.Walker0 = self.playerMgr.createPlayer(vector(-10, 0, 0))
+        # self.Walker1 = self.playerMgr.createPlayer(vector(5, 0,  0))
+        # self.Walker2 = self.playerMgr.createPlayer(vector(5, 0,  5))
+
+        self.playerMgr.setPlayerBottom(-8)
+        #        self.playerMgr.setAsWalker(self.SmartyPants)
+        self.playerMgr.setAsWalker(self.Walker0)
+        # self.playerMgr.setAsWalker(self.Walker1)
+        # self.playerMgr.setAsWalker(self.Walker2)clear
+
+        ## Other Player Attributes
+        self.playerMgr.buildPlayers(sphere(radius=2, color=color.red, opacity=1), vector(0, -6, 0), materials.wood, 0)
+        self.playerMgr.buildPlayers(sphere(radius=2, color=color.green, opacity=1), vector(0, -6, 0), materials.wood, 1)
+        # self.playerMgr.buildPlayers(sphere(radius = 2, color = color.green, opacity = 1 ), vector(0,-6,0), materials.wood, 2)
+        # self.playerMgr.buildPlayers(sphere(radius = 2, color = (.996,.616,.016), opacity = 1), vector(0,-6, 0), materials.wood, 3)
+
+        self.SmartyPants.mass = 800
+        self.Walker0.mass = 2
+
+    def init_arena(self):
+        self.floor1    = flr(self.playerMgr.getPlayerBottom(0))
+        self.ceiling   = bp('y', .05, 'pos')
+        self.frontWall = obstacle((0,     -6.75, -23)  ,(110, 0,  0),2.5, 3, bp('z', -20,'neg'))
+        self.backWall = obstacle ((0,     -6.75,  23)  ,(110, 0,  0),2.5, 3, bp('z',  20,'pos'))
+        self.leftWall = obstacle ((-53.5, -6.75,   0)  ,(0,   0, 44),2.5, 3, bp('x', -50,'neg'))
+        self.rightWall = obstacle((53.5,  -6.75,   0)  ,(0,   0, 44),2.5, 3, bp('x',  50,'pos'))
+        self.arena_boundary.append(self.floor1)
+        self.arena_boundary.append(self.ceiling)
+        self.arena_boundary.append(self.frontWall)
+        self.arena_boundary.append(self.backWall)
+        self.arena_boundary.append(self.leftWall)
+        self.arena_boundary.append(self.rightWall)
+        self.collisionTest1 = CollisionMonitor()
+        self.PLAYERS_COLLISION_KEY = self.collisionTest1.addSet(self.playerMgr.activePlayers)
+        self.ARENA_BOUNDARY_KEY    = self.collisionTest1.addSet(self.arena_boundary)
+
+
+    def init_gui(self):
+        L = 320
+        Hgraph = 450
+        self.graph_window = window(menus=False, _make_panel=True, x=0, y=0, width=800, height=500,
+                                   title='Training Efficiency')
+
+        self.img_window = window(menus=False, _make_panel=True, x=0, y=0, width=800, height=500,
+                                   title='Training Efficiency')
+
+        vbox = wx.BoxSizer(wx.VERTICAL)
+        self.scene1 = display(x=0, y=0, width=1200, height=600)
+        self.scene1.autoscale = False
+        self.scene1.title = 'SphereLand Lab Frame'
+        self.scene1.range = (30, 10, 5)
+
+        self.graph_display = gdisplay(window=self.graph_window, x=0, y=0, width=800 + window.dwidth, height=300)
+        self.log = wx.TextCtrl( self.graph_window.panel, pos=(0,300), size=(800, 200), style=wx.TE_MULTILINE)
+        self.fig = Figure((5,4),75)
+        self.canvas = FigureCanvasWxAgg(self.img_window.panel, -1, self.fig)
+
+
+        vbox.Add(self.graph_window.panel)
+        self.graph_window.panel.SetSizer(vbox)
+        self.gui.log = self.log
+        self.gui.graph = self.fig
+
+        self.playerMgr.set_gui(self.gui)
+
+
+
 class randomWalk (threading.Thread):
     def __init__(self, threadID, envObj, manager, sleep):
         threading.Thread.__init__(self)
@@ -124,6 +178,8 @@ class randomWalk (threading.Thread):
                 if y != 0:
                     self.manager.jump_on_random(self.envObj, walker)
             time.sleep(self.SLEEP)
+
+
 
 ############################### Main Program #############################################
 env1 = enviornment()

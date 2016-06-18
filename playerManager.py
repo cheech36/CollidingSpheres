@@ -201,3 +201,16 @@ class playerManager:
 
     def set_as_trainee(self, trainee):
         self.trainee = trainee
+
+    def set_gui(self, gui):
+        #print(image_plot)
+        brainEngine.message_log = gui.log
+
+        for smart_player in self.activePlayers:
+            if(smart_player.getType() == 'smartPlayer'):
+                print('Found Smart Player')
+                smart_player.brainEngine.init_ui(gui)
+
+        #A = np.random.randint(25, size=(5, 5) )
+        #p1 = brainEngine.stream_plot.add_subplot(111)
+        #p1.imshow(A, interpolation='nearest')
