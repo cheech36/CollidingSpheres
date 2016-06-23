@@ -14,8 +14,8 @@ class smartPlayer2 (player):
         self.sense = sense(id, position, self.scope)
         self.image1 = self.sense.blank_image
         
-        self.brainEngine = brainEngine(self, .05)
-        self.brainEngine.start()
+        self.brain = brainEngine(self, .05)
+        self.brain.start()
         
     def getType(self):
         return self.type
@@ -24,4 +24,4 @@ class smartPlayer2 (player):
         self.image1 = self.sense.look(self.position) 
 
     def train(self, label):
-        self.brainEngine.train(label)
+        self.brain.train(label)

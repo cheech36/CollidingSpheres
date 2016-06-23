@@ -52,6 +52,7 @@ class Gate:
 
 class brainEngine (threading.Thread):
     message_log = None
+    ui          = None
 
     def __init__(self, player1, sleep):
         threading.Thread.__init__(self)
@@ -183,11 +184,15 @@ class brainEngine (threading.Thread):
             N = self.image_sum.sum()
             if(N != 0):
                 inputneurons = self.image_sum.reshape((1, self.scope_x * self.scope_z)) / N
-            #print(inputneurons)
             self.train_data = np.array(inputneurons)
             self.followinstinct = self.myBrain.feedForwardOnly(inputneurons);
             msg = 'Response: ' + str(self.followinstinct[0]) + 'Confidence: ' + str(self.followinstinct[1]) + '\n'
             self.print_to_log(msg)
+            self.ui.plot.imshow(self.image_sum, interpolation='nearest')
+            self.ui.canvas._onSize(1)
+
+
+
             return self.followinstinct
 
     def react(self, instinct):
@@ -212,12 +217,9 @@ class brainEngine (threading.Thread):
 
 
     def print_to_log(self,msg):
-        self.message_log.AppendText(msg)
+        self.ui.log.AppendText(msg)
+        #A = np.random.randint(25, size=(5, 5) )
+        #p1 = self.ui.plot.add_subplot(111)
+        #p1.imshow(A, interpolation='nearest')
 
 
-    def init_ui(self, ui):
-        #self.A = np.random.randint(25, size=(5, 5))
-        #self.p2 = stream_plot.add_subplot(111)
-        #self.p2.imshow(self.A, interpolation='nearest')
-        print(ui.log)
-        self.message_log = ui.log

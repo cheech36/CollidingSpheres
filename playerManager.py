@@ -20,6 +20,7 @@ class playerManager:
         bs.playerManager   = self
         brainEngine.playerManager = self # Register with Brain Engine Class
 
+
     def createPlayer(self, position = vector):
         newPlayer = player(position, self.playerCount)
         self.activePlayers.append(newPlayer)
@@ -36,6 +37,8 @@ class playerManager:
         if len(self.activePlayers) == 1:
             self.active = self.activePlayers[0]
         return newPlayer
+
+
 
     def setPlayerMass(self, mass, id = 0):
         ##If no id is given set all player to this mass
@@ -202,15 +205,24 @@ class playerManager:
     def set_as_trainee(self, trainee):
         self.trainee = trainee
 
-    def set_gui(self, gui):
+    def set_ui(self, ui):
         #print(image_plot)
-        brainEngine.message_log = gui.log
+        self.ui = ui
+        brainEngine.ui = ui
 
-        for smart_player in self.activePlayers:
-            if(smart_player.getType() == 'smartPlayer'):
-                print('Found Smart Player')
-                smart_player.brainEngine.init_ui(gui)
 
-        #A = np.random.randint(25, size=(5, 5) )
-        #p1 = brainEngine.stream_plot.add_subplot(111)
-        #p1.imshow(A, interpolation='nearest')
+        #for smart_player in self.activePlayers:
+        #    if(smart_player.getType() == 'smartPlayer'):
+        #        print('Found Smart Player')
+        #        smart_player.brain.init_ui(gui)
+
+        A = np.random.randint(196, size=(14, 14) )
+        ui.plot.imshow(A, interpolation='nearest')
+
+    def update_ui(self):
+        if(self.ui.update_plot):
+            print('Udated UI')
+            A = self.ui.plot_data
+            p1 = self.ui.plot.add_subplot(111)
+            p1.imshow(A, interpolation='nearest')
+            self.ui.update_plot = False

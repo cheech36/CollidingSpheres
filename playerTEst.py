@@ -22,9 +22,12 @@ from matplotlib.figure import Figure
 
 
 class gui_manager:
-    def __init__(self, log=None, graph=None):
+    def __init__(self, log=None, graph=None, plot=None):
         self.log = log
         self.graph = graph
+        self.plot  = plot
+        self.update_plot = False
+
 
 
 
@@ -44,10 +47,6 @@ class enviornment:
         self.centerOfMass        = vector()
         self.playerMgr           = playerManager()
         self.playerMgr.envObj    = self
-
-
-
-        self.gui = gui_manager()
         self.init_gui()
         self.playerMgr.scene( self.scene1 )
         self.init_players()
@@ -70,6 +69,7 @@ class enviornment:
                 self.collisionTest1.check_player_player_collision(self.PLAYERS_COLLISION_KEY)
                 self.collisionTest1.check_obstacle_player_collision(self.ARENA_BOUNDARY_KEY,
                                                                     self.PLAYERS_COLLISION_KEY)
+                #self.playerMgr.update_ui()
             if self.pauseCount == 0:
                 print('Paused')
                 print('Active Forces List: ', self.activeForcesList)
@@ -148,17 +148,21 @@ class enviornment:
         self.scene1.range = (30, 10, 5)
 
         self.graph_display = gdisplay(window=self.graph_window, x=0, y=0, width=800 + window.dwidth, height=300)
-        self.log = wx.TextCtrl( self.graph_window.panel, pos=(0,300), size=(800, 200), style=wx.TE_MULTILINE)
-        self.fig = Figure((5,4),75)
-        self.canvas = FigureCanvasWxAgg(self.img_window.panel, -1, self.fig)
+        log = wx.TextCtrl( self.graph_window.panel, pos=(0,300), size=(800, 200), style=wx.TE_MULTILINE)
+        fig = Figure((5,4),75)
+        canvas = FigureCanvasWxAgg(self.img_window.panel, -1, fig)
+        p1 = fig.add_subplot(111)
 
 
         vbox.Add(self.graph_window.panel)
         self.graph_window.panel.SetSizer(vbox)
-        self.gui.log = self.log
-        self.gui.graph = self.fig
 
-        self.playerMgr.set_gui(self.gui)
+        self.ui = gui_manager(log,self.graph_display,p1)
+        self.ui.canvas = canvas
+        self.playerMgr.set_ui(self.ui)
+
+
+
 
 
 
