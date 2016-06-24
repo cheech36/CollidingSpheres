@@ -13,6 +13,7 @@ from playerManager import*
 from smartPlayer import *
 import threading
 import time
+import GUI as UI
 
 ### Matplotlib
 import matplotlib
@@ -27,9 +28,6 @@ class gui_manager:
         self.graph = graph
         self.plot  = plot
         self.update_plot = False
-
-
-
 
 class enviornment:
 
@@ -135,34 +133,17 @@ class enviornment:
     def init_gui(self):
         L = 320
         Hgraph = 450
-        self.graph_window = window(menus=False, _make_panel=True, x=0, y=0, width=800, height=500,
-                                   title='Training Efficiency')
 
-        self.img_window = window(menus=False, _make_panel=True, x=0, y=0, width=800, height=500,
-                                   title='Training Efficiency')
-
-        vbox = wx.BoxSizer(wx.VERTICAL)
+        self.controll_Window = UI.DisplayPanel('Display Panel')
         self.scene1 = display(x=0, y=0, width=1200, height=600)
         self.scene1.autoscale = False
         self.scene1.title = 'SphereLand Lab Frame'
         self.scene1.range = (30, 10, 5)
 
-        self.graph_display = gdisplay(window=self.graph_window, x=0, y=0, width=800 + window.dwidth, height=300)
-        log = wx.TextCtrl( self.graph_window.panel, pos=(0,300), size=(800, 200), style=wx.TE_MULTILINE)
-        fig = Figure((5,4),75)
-        canvas = FigureCanvasWxAgg(self.img_window.panel, -1, fig)
-        p1 = fig.add_subplot(111)
-
-
-        vbox.Add(self.graph_window.panel)
-        self.graph_window.panel.SetSizer(vbox)
-
-        self.ui = gui_manager(log,self.graph_display,p1)
-        self.ui.canvas = canvas
+        self.graph_display = UI.GraphPanel('Training Efficiency')
+        self.ui = gui_manager(self.controll_Window.msg,self.graph_display,self.controll_Window.axes)
+        self.ui.canvas = self.controll_Window.canvas
         self.playerMgr.set_ui(self.ui)
-
-
-
 
 
 

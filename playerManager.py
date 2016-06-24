@@ -210,15 +210,6 @@ class playerManager:
         self.ui = ui
         brainEngine.ui = ui
 
-
-        #for smart_player in self.activePlayers:
-        #    if(smart_player.getType() == 'smartPlayer'):
-        #        print('Found Smart Player')
-        #        smart_player.brain.init_ui(gui)
-
-        A = np.random.randint(196, size=(14, 14) )
-        ui.plot.imshow(A, interpolation='nearest')
-
     def update_ui(self):
         if(self.ui.update_plot):
             print('Udated UI')
