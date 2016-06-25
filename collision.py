@@ -70,7 +70,6 @@ class aabb:
         return threatCount
 
     def check_for_players_in_cell(self):
-
         incoming = 0
         threatCount = 0
         for incomingPlayer in self.playerManager.activePlayers:

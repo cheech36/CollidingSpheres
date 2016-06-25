@@ -50,12 +50,11 @@ class Gate:
         return self.stream_size
 
 
-class brainEngine (threading.Thread):
+class brainEngine:
     message_log = None
     ui          = None
 
     def __init__(self, player1, sleep):
-        threading.Thread.__init__(self)
         self.player = player1
         self.SLEEP = sleep
         self.sense = self.player.sense
@@ -88,9 +87,9 @@ class brainEngine (threading.Thread):
 
 
 
-    def run(self):
+    def run(self, time):
         listqueue = [];
-        while True:
+        if( not ( time % 20)):
             buffer = self.sense.look(self.position)
             if (len(self.player.collision_history) > 0):
                 collision_data = self.player.collision_history.pop()
@@ -138,7 +137,7 @@ class brainEngine (threading.Thread):
                     self.gate.test_boundary = False
 
 
-            time.sleep(self.SLEEP)
+            #time.sleep(self.SLEEP)
 
 
     def train(self, label):

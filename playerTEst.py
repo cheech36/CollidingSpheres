@@ -62,11 +62,11 @@ class enviornment:
             rate(self.rate)
             while self.notPaused:
                 rate(self.rate)
-                self.playerMgr.updatePlayers()
+                self.playerMgr.updatePlayers(self.globalTime)
                 self.playerMgr.applyForces(self)
                 self.collisionTest1.check_player_player_collision(self.PLAYERS_COLLISION_KEY)
-                self.collisionTest1.check_obstacle_player_collision(self.ARENA_BOUNDARY_KEY,
-                                                                    self.PLAYERS_COLLISION_KEY)
+                self.collisionTest1.check_obstacle_player_collision(self.ARENA_BOUNDARY_KEY, self.PLAYERS_COLLISION_KEY)
+                self.globalTime += 1
                 #self.playerMgr.update_ui()
             if self.pauseCount == 0:
                 print('Paused')

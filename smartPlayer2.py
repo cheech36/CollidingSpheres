@@ -15,13 +15,13 @@ class smartPlayer2 (player):
         self.image1 = self.sense.blank_image
         
         self.brain = brainEngine(self, .05)
-        self.brain.start()
+        #self.brain.start()
         
     def getType(self):
         return self.type
 
-    def look(self):
-        self.image1 = self.sense.look(self.position) 
+    def look(self, time):
+        self.brain.run(time)
 
     def train(self, label):
         self.brain.train(label)

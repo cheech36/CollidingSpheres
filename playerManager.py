@@ -68,12 +68,15 @@ class playerManager:
             self.activePlayers[id].addComponent(self, shape, relativePosition, color, material)
             self.activePlayers[id].body.material = material
 
-    def updatePlayers(self):
+    def updatePlayers(self, time = 0):
         for player in self.activePlayers:
             player.fullRender()
             player.updateVelocity()
             player.roll()
             player.age()                   ## Assumes player is a sphere, need to add player flag 'rollEnabled'
+            if (player.getType() == 'smartPlayer'):
+                player.look(time)
+
 
     def setPlayerBottom(self, yValue):
         for player in self.activePlayers:
