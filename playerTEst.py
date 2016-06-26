@@ -15,6 +15,7 @@ import threading
 import time
 import GUI as UI
 
+
 ### Matplotlib
 import matplotlib
 from matplotlib.figure import Figure
@@ -135,6 +136,8 @@ class enviornment:
         Hgraph = 450
 
         self.controll_Window = UI.DisplayPanel('Display Panel')
+        # For Dual Monitor x = 1300 is perfect
+        # For Monitor Information use xrandr
         self.scene1 = display(x=0, y=0, width=1200, height=600)
         self.scene1.autoscale = False
         self.scene1.title = 'SphereLand Lab Frame'

@@ -3,7 +3,9 @@ from visual.graph import *
 import wx
 import numpy as np
 from matplotlib.figure import Figure
+import matplotlib.animation as animation
 from matplotlib.backends.backend_wxagg import Toolbar, FigureCanvasWxAgg
+import matplotlib.pyplot as plt
 
 
 
@@ -18,9 +20,9 @@ class ControllPanel(wx.Frame):
 
 class DisplayPanel(wx.Frame):
     def __init__(self, title):
-        super(DisplayPanel,self).__init__(None, title=title, size = (500,500))
+        super(DisplayPanel,self).__init__(None, title=title, size = (500,450))
 
-        h = 500
+        h = 450
         w = 500
 
         vbox1 = wx.BoxSizer(wx.VERTICAL)
@@ -29,6 +31,7 @@ class DisplayPanel(wx.Frame):
         hbox3 = wx.BoxSizer(wx.HORIZONTAL)
         self.panel = wx.Panel(self, -1)
         self.panel.SetBackgroundColour('#4f5049')
+
 
 
         menubar = wx.MenuBar()
@@ -41,24 +44,36 @@ class DisplayPanel(wx.Frame):
         self.msg = wx.TextCtrl(self.panel,size=(w, h), style=wx.TE_MULTILINE)
         hbox1.Add(self.msg, proportion=0, flag=wx.EXPAND)
 
+        self.nb = wx.Notebook(self.panel)
+
+        """Begin Tabs"""
+        #Tab1
+        self.tab1 = wx.Panel(self.nb)
         self.fig = Figure((5,4),75)
         self.axes = self.fig.add_subplot(111)
+        self.canvas = FigureCanvasWxAgg(self.tab1, -1, self.fig)
+        self.nb.AddPage(self.tab1,"Stream")
 
-        self.canvas = FigureCanvasWxAgg(self.panel, -1, self.fig)
-        hbox2.Add(self.canvas, proportion=1, flag=wx.EXPAND| wx.BOTTOM)
+        #Tab2
+        self.tab2 = wx.Panel(self.nb)
+        t2 = wx.StaticText(self.tab2, label="Tensor Board Goes Here")
+        self.nb.AddPage(self.tab2, "Network")
+        """End Tabs"""
 
+        hbox2.Add(self.nb, proportion=1, flag=wx.EXPAND| wx.BOTTOM)
+        """
         self.ID_RANDOM = wx.NewId()
         b1 = wx.Button(self.panel, label='Random Plot', id=self.ID_RANDOM)
         hbox3.Add(b1, proportion = 0, flag = wx.EXPAND)
         self.Bind(wx.EVT_BUTTON, self.newPlot, id=self.ID_RANDOM)
-
+        """
         vbox1.Add(hbox2, proportion=0, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=0)
         vbox1.Add(hbox3, flag=wx.CENTER)
         vbox1.Add(hbox1, proportion=0, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=0)
 
 
         self.panel.SetSizer(vbox1)
-        self.Center()
+        self.Move((200,0))
         self.Show()
 
     def  newPlot(self, e):
@@ -78,5 +93,13 @@ class DisplayPanel(wx.Frame):
 
 class GraphPanel:
     def __init__(self, title):
-        self.graph_window = window(menus=False, _make_panel=True, x=0, y=0, width=800, height=200, title=title)
+        self.graph_window = window(menus=False, _make_panel=True, x=200, y=480, width=800, height=200, title=title)
         self.graph_display = gdisplay(window=self.graph_window, x=0, y=0, width=800, height=200)
+        self.graph = gcurve(dot_color=color.cyan)
+
+
+
+    def plot(self, point):
+                x = point[0]
+                y = point[1]
+                self.graph.plot(pos=point)

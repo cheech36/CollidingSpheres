@@ -77,8 +77,8 @@ class brainEngine:
 
         self.gate.display_graph = True
         self.gate.display_plot  = False
-        if(self.gate.display_graph):
-            self.train_graph = gcurve(color=color.cyan)
+        #if(self.gate.display_graph):
+        #    self.train_graph = self.ui.graph
 
         # Make the bain
         self.myBrain = NeuralBrain("NeuralModel_Logit_1Hl-n50_2Outputs", self.scope_x*self.scope_z, 1, 50);
@@ -168,7 +168,7 @@ class brainEngine:
             accuaracy = self.correct_response / self.stream_count
             print('Train Label', label, 'Training Efficiency: ', accuaracy )
             if(self.gate.display_graph):
-                self.train_graph.plot(pos=(self.stream_count,accuaracy))
+                self.ui.graph.plot((self.stream_count,accuaracy))
             print("\n")
 
         else:
