@@ -233,3 +233,16 @@ class playerManager:
             p1 = self.ui.plot.add_subplot(111)
             p1.imshow(A, interpolation='nearest')
             self.ui.update_plot = False
+
+    def toggle_friction(self, status):
+        if 'friction' in self.envObj.activeForcesList:
+            self.envObj.activeForcesList.remove('friction')
+            del self.envObj.activeForcesDict['friction']
+            self.unsetForce(-1,'friction')
+            print('turning Friction off')
+        else:
+            self.envObj.activeForcesList.append('friction')
+            self.envObj.activeForcesDict.update({'friction':self.getActivePlayer().id})
+            self.setForce(-1,'friction')
+            print('turning Friction On')
+        print(self.envObj.activeForcesDict)

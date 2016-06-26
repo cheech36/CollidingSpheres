@@ -1,3 +1,4 @@
+from __future__ import division
 from visual import *
 from visual.graph import *
 import wx
@@ -8,6 +9,7 @@ from matplotlib.backends.backend_wxagg import Toolbar, FigureCanvasWxAgg
 import matplotlib.pyplot as plt
 
 import playerManager
+from collision import CollisionMonitor
 
 
 
@@ -110,7 +112,11 @@ class DisplayPanel(wx.Frame):
         print(self.sc_player.GetValue() - 1, type(self.sc_player.GetValue()))
         self.playerManager.silent_Change( self.sc_player.GetValue() - 1)
 
+    def OnBounceScroll(self,e):
+        CollisionMonitor.restitution = self.bounce_slider.GetValue()/100
 
+    def ToggleFriction(self,e):
+        self.playerManager.toggle_friction(1)
 
 
 
@@ -118,6 +124,8 @@ class DisplayPanel(wx.Frame):
         self.controll_panel = wx.Panel(self.main_panel, -1, size=(300,450))
         vbox_cont = wx.BoxSizer(wx.VERTICAL)
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox2 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox3 = wx.BoxSizer(wx.HORIZONTAL)
         hbox1.Add(wx.StaticText(self.controll_panel,label='Active Player: '),flag=wx.LEFT, border = 20)
         self.sc_player = wx.SpinCtrl(self.controll_panel, value='1', size=(60,-1))
 
@@ -125,10 +133,21 @@ class DisplayPanel(wx.Frame):
         self.sc_player.SetRange(1,2)
         hbox1.Add(self.sc_player,flag=wx.LEFT, border=5)
 
+        self.bounce_slider = wx.Slider(self.controll_panel, value=0, minValue=0, maxValue=100, size=(200,-1), style=wx.SL_HORIZONTAL)
+        self.bounce_slider.Bind(wx.EVT_SCROLL,self.OnBounceScroll)
+
+        hbox2.Add(wx.StaticText(self.controll_panel, label='Bounce: '), flag=wx.LEFT, border = 10)
+        hbox2.Add(self.bounce_slider, flag=wx.ALIGN_CENTER)
+
+        cb_friction = wx.CheckBox(self.controll_panel, label='Friction')
+        cb_friction.Bind(wx.EVT_CHECKBOX, self.ToggleFriction)
+        hbox3.Add(cb_friction, flag=wx.LEFT,border=10 )
 
 
 
         vbox_cont.Add(hbox1, flag = wx.TOP, border=40)
+        vbox_cont.Add(hbox2, flag = wx.TOP, border = 10)
+        vbox_cont.Add(hbox3, flag = wx.TOP, border = 10)
         self.controll_panel.SetSizer(vbox_cont)
         return self.controll_panel
 
