@@ -50,6 +50,7 @@ class enviornment:
         self.playerMgr.scene( self.scene1 )
         self.init_players()
         self.init_arena()
+        print('Num of players',self.playerMgr.playerCount)
 
 
 ## Other Player Attributes
@@ -135,10 +136,11 @@ class enviornment:
         L = 320
         Hgraph = 450
 
-        self.controll_Window = UI.DisplayPanel('Display Panel')
+        self.controll_Window = UI.DisplayPanel('Display Panel',self.playerMgr)
+        self.controll_Window.playerManager = self.playerMgr
         # For Dual Monitor x = 1300 is perfect
         # For Monitor Information use xrandr
-        self.scene1 = display(x=0, y=0, width=1200, height=600)
+        self.scene1 = display(x=1300, y=0, width=1200, height=600)
         self.scene1.autoscale = False
         self.scene1.title = 'SphereLand Lab Frame'
         self.scene1.range = (30, 10, 5)

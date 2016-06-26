@@ -10,6 +10,7 @@ from brainEngine import *
 
 class playerManager:
     envObj = None
+
     def __init__(self):
         self.activePlayers = list()
         self.playerCount = 0
@@ -19,6 +20,7 @@ class playerManager:
         aabb.playerManager = self ## Register with aabb collision class
         bs.playerManager   = self
         brainEngine.playerManager = self # Register with Brain Engine Class
+
 
 
     def createPlayer(self, position = vector):
@@ -105,6 +107,17 @@ class playerManager:
             self.activePlayerID = active.getID()
             self.scene.center = self.psBox.pos
             return active
+
+    def silent_Change(self, id):
+
+        if id  < 0:
+            return self.activePlayers[id]
+        else:
+            print('Player manager Changing to player: ', id)
+            active = self.activePlayers[id]
+            self.activePlayerID = active.getID()
+
+
 
     def scene(self, scene):
         self.scene = scene

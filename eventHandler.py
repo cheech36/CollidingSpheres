@@ -6,7 +6,6 @@ class eventHandler:
     def __init__(self , envObj):
         self.env          =  envObj
         self.playerManager = envObj.playerMgr
-        self.activePlayer = self.playerManager.getActivePlayer()
         self.mode         = 0
         self.env.scene1.bind('keydown', self.handleKeyDown )
         self.env.scene1.bind('keyup'  , self.handleKeyUp   )
@@ -59,8 +58,8 @@ class eventHandler:
             self.tKeyDown()
 
         if evt.key == 'l':      # Look  - Don't use
-            print('Player is at: ', self.activePlayer.position)
-            self.playerManager.look(self.activePlayer)
+            print('Player is at: ', self.playerManager.getActivePlayer().position)
+            self.playerManager.look(self.playerManager.getActivePlayer())
 
         if evt.key == 'j':     # Manual Indicate - Right Decision
             self.jKeyDown()
@@ -70,24 +69,26 @@ class eventHandler:
 
     def leftKeyDown(self):
         if self.mode == 1:
-            self.activePlayer = self.playerManager.changePlayer(-1)
+            self.playerManager.changePlayer(-1)
+            print('eventHandler change', self.playerManager.getActivePlayer().getID())
             return
         else:
 
             forward = self.forward
             forward[1] = 0 # set y value to 0
             left = 2*rotate(forward.norm(), angle = pi/2, axis = (0,1,0))
-            self.activePlayer.moveLeft(left)
+            self.playerManager.getActivePlayer().moveLeft(left)
 
     def rightKeyDown(self):
         if self.mode == 1:
-            self.activePlayer = self.playerManager.changePlayer(1)
+            self.playerManager.changePlayer(1)
+            print('eventHandler change', self.playerManager.getActivePlayer().getID())
             return
         else:
             forward = self.forward
             forward[1] = 0 # set y value to 0
             right = 2*rotate(forward.norm(), angle = -pi/2, axis = (0,1,0))
-            self.activePlayer.moveRight(right)
+            self.playerManager.getActivePlayer().moveRight(right)
 
     def upKeyDown(self):
         if self.mode == 1:
@@ -95,19 +96,19 @@ class eventHandler:
         else:
             forward = self.forward
             forward[1] = 0 # set y value to 0
-            self.activePlayer.moveUp(2*forward.norm())
+            self.playerManager.getActivePlayer().moveUp(2*forward.norm())
     def downKeyDown(self):
         if self.mode == 1:
             return
         else:
             backward = -self.forward
             backward[1] = 0 # set y value to 0
-            self.activePlayer.moveDown(2*backward.norm())
+            self.playerManager.getActivePlayer().moveDown(2*backward.norm())
 
     def spaceKeyDown(self):
-        if self.activePlayer.position.y == 0:
-            self.activePlayer = self.playerManager.getActivePlayer()
-            self.activePlayer.chargeJump()
+        if self.playerManager.getActivePlayer().position.y == 0:
+            #self.activePlayer = self.playerManager.getActivePlayer()
+            self.playerManager.getActivePlayer().chargeJump()
 
     def fKeyDown(self):
         if 'friction' in self.env.activeForcesList:
@@ -117,18 +118,18 @@ class eventHandler:
             print('turning Friction off')
         else:
             self.env.activeForcesList.append('friction')
-            self.env.activeForcesDict.update({'friction':self.activePlayer.id})
+            self.env.activeForcesDict.update({'friction':self.playerManager.getActivePlayer().id})
             self.playerManager.setForce(-1,'friction')
             print('turning Friction On')
         print(self.env.activeForcesDict)
 
     def sKeyDown(self):
-#        if self.activePlayer.position.y == 0:
-            self.activePlayer.setVelocity(vector(0,0,0))
+#        if self.playerManager.getActivePlayer().position.y == 0:
+            self.playerManager.getActivePlayer().setVelocity(vector(0,0,0))
 
     def oKeyDown(self):
-##       if self.activePlayer.position.y == 0:
-            self.activePlayer.setPosition(vector(-5,0,0))
+##       if self.playerManager.getActivePlayer().position.y == 0:
+            self.playerManager.getActivePlayer().setPosition(vector(-5,0,0))
 
 
     def jKeyDown(self):
@@ -138,17 +139,18 @@ class eventHandler:
         self.playerManager.train('nojump')
 
     def pKeyDown(self):
-        self.activePlayer.print_stats()
+        self.playerManager.getActivePlayer().print_stats()
 
     def oneKeyDown(self):
-        self.activePlayer = self.env.p1
+        pass
+        #self.activePlayer = self.env.p1
 
     def twoKeyDown(self):
-        self.activePlayer = self.env.p2
+        #self.activePlayer = self.env.p2
         print('Player 2 is active')
 
     def threeKeyDown(self):
-        self.activePlayer = self.env.p3
+        #self.activePlayer = self.env.p3
         print('Player 3 is active')
 
 
@@ -161,16 +163,16 @@ class eventHandler:
                 self.playerManager.unpause()
 
     def leftKeyDown_Paused(self):
-            id = self.activePlayer.getID()
+            id = self.playerManager.getActivePlayer().getID()
             self.activePlayer = self.playerManager.activePlayers[ id - 2]
-            print('new active player: ', self.activePlayer.getID())
-            self.playerManager.playerSelect(self.activePlayer, self.psBox)
+            print('new active player: ', self.playerManager.getActivePlayer().getID())
+            self.playerManager.playerSelect(self.playerManager.getActivePlayer(), self.psBox)
 
     def rightKeyDown_Paused(self):
-            id = self.activePlayer.getID()
+            id = self.playerManager.getActivePlayer().getID()
             self.activePlayer = self.playerManager.activePlayers[ id ]
-            print('new active player: ', self.activePlayer.getID())
-            self.playerManager.playerSelect(self.activePlayer, self.psBox)
+            print('new active player: ', self.playerManager.getActivePlayer().getID())
+            self.playerManager.playerSelect(self.playerManager.getActivePlayer(), self.psBox)
 
     def tKeyDown(self):
             if self.mode == 2:
@@ -186,7 +188,7 @@ class eventHandler:
             self.spaceKeyUp()
 
     def spaceKeyUp(self):
-        self.playerManager.jump_on_keyup(self.env, self.activePlayer)
+        self.playerManager.jump_on_keyup(self.env, self.playerManager.getActivePlayer())
 
     def handleClick(self,evt):
         if self.mode == 0:
