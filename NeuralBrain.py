@@ -69,16 +69,22 @@ class NeuralBrain: # each input neuron has 2 columns and we'll add-ish them toge
         self.biases1 = tf.Variable(tf.zeros([layer1_hidden_numnodes]))
         self.hidden1 = tf.nn.relu(tf.matmul(self.tf_train_dataset, self.weights1) + self.biases1);
       
-      with tf.name_scope('output_neuron_scope'):
-        self.weights2 = tf.Variable(tf.truncated_normal([layer1_hidden_numnodes, self.DEFINE_num_output_classes]))
-        self.biases2 = tf.Variable(tf.zeros([self.DEFINE_num_output_classes]))
-        self.logits2 = tf.matmul(self.hidden1, self.weights2) + self.biases2;
+      with tf.name_scope('hidden2_scope'):
+        self.weights2 = tf.Variable(tf.truncated_normal([layer1_hidden_numnodes, layer1_hidden_numnodes]))
+        self.biases2 = tf.Variable(tf.zeros([layer1_hidden_numnodes]))
+        self.logits2 = tf.nn.relu(tf.matmul(self.hidden1, self.weights2) + self.biases2)
 
-     # Predictions for the training, validation, and test data.
-      self.train_prediction = tf.nn.softmax(self.logits2);
-      self.train_loss = tf.reduce_mean (tf.nn.softmax_cross_entropy_with_logits (self.logits2, self.tf_train_labels));
-      self.optimizer = tf.train.GradientDescentOptimizer(0.1).minimize (self.train_loss);
-      #self.optimizer = tf.train.FtrlOptimizer (0.9).minimize(self.train_loss)
+      with tf.name_scope('output_neuron_scope'):
+        self.weights3 = tf.Variable(tf.truncated_normal([layer1_hidden_numnodes, self.DEFINE_num_output_classes]))
+        self.biases3 = tf.Variable(tf.zeros([self.DEFINE_num_output_classes]))
+        self.logits3 = tf.matmul(self.logits2, self.weights3) + self.biases3;
+
+
+            # Predictions for the training, validation, and test data.
+      self.train_prediction = tf.nn.softmax(self.logits3);
+      self.train_loss = tf.reduce_mean (tf.nn.softmax_cross_entropy_with_logits (self.logits3, self.tf_train_labels));
+      #self.optimizer = tf.train.GradientDescentOptimizer(0.1).minimize (self.train_loss);
+      self.optimizer = tf.train.FtrlOptimizer (0.9).minimize(self.train_loss)
     
       # Add summary ops to collect data
       self.tb_summ_hist_w1 = tf.histogram_summary("weights1", self.weights1)
@@ -87,6 +93,10 @@ class NeuralBrain: # each input neuron has 2 columns and we'll add-ish them toge
       self.tb_summ_hist_w2 = tf.histogram_summary("weights2", self.weights2)
       self.tb_summ_hist_b2 = tf.histogram_summary("biases2", self.biases2)
       self.tb_summ_hist_logits2 = tf.histogram_summary("logits2", self.logits2)
+      self.tb_summ_hist_w3 = tf.histogram_summary("weights3", self.weights3)
+      self.tb_summ_hist_b3 = tf.histogram_summary("biases3", self.biases3)
+      self.tb_summ_hist_logits3 = tf.histogram_summary("logits3", self.logits3)
+
       self.tb_summ_scal_train_loss = tf.scalar_summary("custom train_loss", self.train_loss)
       self.tb_merged = tf.merge_all_summaries()
       
