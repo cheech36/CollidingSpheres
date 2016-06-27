@@ -222,3 +222,5 @@ class brainEngine:
         #p1.imshow(A, interpolation='nearest')
 
 
+    def save(self):
+        self.myBrain.trainAndSaveModel(None, None, True)

@@ -36,19 +36,21 @@ class NeuralBrain: # each input neuron has 2 columns and we'll add-ish them toge
        
          
   # train the model.  The model will always be saved to disk in case reloading is desired 
-  def trainAndSaveModel (self, batch_data, batch_labels):
+  def trainAndSaveModel (self, batch_data, batch_labels, save=False):
     with self.tfsession.as_default ():
-#       writer = tf.train.SummaryWriter (self.brainlogdir, self.tfsession.graph_def)
 
-#       batch_data = train_dataset.reshape (train_dataset.shape[0],1)[offset:(offset + graph_minibatchsize),:]
-#       batch_labels = train_labels.reshape (train_labels.shape[0],1)[offset:(offset + graph_minibatchsize),:]
-       feed_dict = {self.tf_train_dataset : batch_data, self.tf_train_labels : batch_labels}
-        
-       _, train_loss, tb_merged = self.tfsession.run([self.optimizer, self.train_loss, self.tb_merged], feed_dict=feed_dict);
-#       print "Minibatch loss at current runtime step", self.runtimestep, ":", train_loss;
-       self.runtimestep += 1;
-#       writer.add_summary(tb_merged, self.runtimestep);
-#       self.saver.save (self.tfsession, self.brainmodeldir)
+       if(not(save)):
+    #       batch_data = train_dataset.reshape (train_dataset.shape[0],1)[offset:(offset + graph_minibatchsize),:]
+    #       batch_labels = train_labels.reshape (train_labels.shape[0],1)[offset:(offset + graph_minibatchsize),:]
+           feed_dict = {self.tf_train_dataset : batch_data, self.tf_train_labels : batch_labels}
+
+           _, train_loss, tb_merged = self.tfsession.run([self.optimizer, self.train_loss, self.tb_merged], feed_dict=feed_dict);
+    #       print "Minibatch loss at current runtime step", self.runtimestep, ":", train_loss;
+           self.runtimestep += 1;
+       if(save):
+           writer = tf.train.SummaryWriter(self.brainlogdir, self.tfsession.graph_def)
+           writer.add_summary(tb_merged, self.runtimestep);
+           self.saver.save (self.tfsession, self.brainmodeldir)
        
     
   def __init__ (self, modelname, input_size, batch_size, layer1_hidden_numnodes):

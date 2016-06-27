@@ -234,7 +234,7 @@ class playerManager:
             p1.imshow(A, interpolation='nearest')
             self.ui.update_plot = False
 
-    def toggle_friction(self, status):
+    def toggle_friction(self, mode = False):
         if 'friction' in self.envObj.activeForcesList:
             self.envObj.activeForcesList.remove('friction')
             del self.envObj.activeForcesDict['friction']
@@ -246,3 +246,10 @@ class playerManager:
             self.setForce(-1,'friction')
             print('turning Friction On')
         print(self.envObj.activeForcesDict)
+        if(not(mode)):
+            self.ui.controll_window.ToggleFriction('manager')
+
+    def save(self):
+        for player in self.activePlayers:
+            if player.getType() == 'smartPlayer':
+                player.save()

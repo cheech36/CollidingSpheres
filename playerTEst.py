@@ -148,6 +148,7 @@ class enviornment:
         self.graph_display = UI.GraphPanel('Training Efficiency')
         self.ui = gui_manager(self.controll_Window.msg,self.graph_display,self.controll_Window.axes)
         self.ui.canvas = self.controll_Window.canvas
+        self.ui.controll_window = self.controll_Window
         self.playerMgr.set_ui(self.ui)
 
 

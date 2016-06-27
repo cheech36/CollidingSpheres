@@ -111,17 +111,8 @@ class eventHandler:
             self.playerManager.getActivePlayer().chargeJump()
 
     def fKeyDown(self):
-        if 'friction' in self.env.activeForcesList:
-            self.env.activeForcesList.remove('friction')
-            del self.env.activeForcesDict['friction']
-            self.playerManager.unsetForce(-1,'friction')
-            print('turning Friction off')
-        else:
-            self.env.activeForcesList.append('friction')
-            self.env.activeForcesDict.update({'friction':self.playerManager.getActivePlayer().id})
-            self.playerManager.setForce(-1,'friction')
-            print('turning Friction On')
-        print(self.env.activeForcesDict)
+        self.playerManager.toggle_friction()
+
 
     def sKeyDown(self):
 #        if self.playerManager.getActivePlayer().position.y == 0:
