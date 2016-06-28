@@ -48,9 +48,10 @@ class sense:
                 cell.player_id = self.player_id
                 net.append(cell)
                 if self.net_visible_f:
-                    self.net_visual_display.append(box(pos = mesh_position, length=2*u-.1,
-                                                       width=2*u-.1, height=2*u-.1, color = color.blue))
+                    cell.display_box = box(pos = mesh_position, length=2*u-.1, width=2*u-.1, height=2*u-.1, color = color.blue)
+                    self.net_visual_display.append( cell.display_box)
                 previous_id += 1
+        self.unit_size = 2*u-.1
         return net
 
     def move_net(self, new_position_center):
@@ -90,3 +91,13 @@ class sense:
 
 
 
+    def remove_net_visual(self):
+        for cell in self.net:
+            cell.display_box.length  = 0
+            cell.display_box.width   = 0
+            cell.display_box.height  = 0
+            cell.display_box.visble = False
+            del cell.display_box
+
+    def restore_net_visual(self):
+        self.formNet(self.scope)

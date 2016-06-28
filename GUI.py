@@ -186,13 +186,19 @@ class DisplayPanel(wx.Frame):
         self.properties_txtCtrl[2].AppendText(str(player.mass))
         self.properties_txtCtrl[3].AppendText(str(player.position))
         self.properties_txtCtrl[4].AppendText(str(player.velocity))
+
         self.properties_txtCtrl[0].SetEditable(False)
         self.properties_txtCtrl[1].SetEditable(False)
+
+        type = player.getType()
+        if(type == "smartPlayer"):
+            self.properties_txtCtrl[5].AppendText(str(player.sense.net_visible_f))
+
         #self.properties_txtCtrl[0]=str(player
 
 
     def load_player_properties(self):
-        properties = ["ID:", "Type:", "Mass:","position","velocity"]
+        properties = ["ID:", "Type:", "Mass:","position","velocity", "net visible"]
         gs = wx.GridSizer(len(properties),2)
         self.properties_txtCtrl = []
         for property in properties:
@@ -201,12 +207,24 @@ class DisplayPanel(wx.Frame):
             txt_ctrl = wx.TextCtrl(self.playerPanel,size=(100,-1))
             self.properties_txtCtrl.append(txt_ctrl)
             gs.Add(txt_ctrl)
+
         return gs
 
 
     def set_player_stats(self, e):
         player = self.playerManager.getActivePlayer()
         player.mass = int(self.properties_txtCtrl[2].GetValue())
+
+        type = player.getType()
+        if(type == "smartPlayer"):
+            new_val = self.properties_txtCtrl[5].GetValue()
+            if (new_val == "False"):
+                player.sense.net_visible_f = False
+                player.sense.remove_net_visual()
+            elif (new_val == "True"):
+                player.sense.net_visible_f = True
+                player.sense.restore_net_visual()
+
 
 
 class GraphPanel:
