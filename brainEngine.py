@@ -23,6 +23,7 @@ class Gate:
         self.test_boundary = False
         self.display_graph = False
         self.display_plot  = False
+        self.train_lock    = False
     def __check__(self, key):
         index = np.where(key == True)[0][0]
         return self.status[index]
@@ -66,6 +67,8 @@ class brainEngine:
         self.image_old = self.sense.blank()
         self.image_sum = self.sense.blank()
         self.stream_count = 0
+        self.stream_train_bffr = 0
+        self.train_count = 0
         self.correct_response = 0
         self.trainset = list()
 
@@ -86,7 +89,6 @@ class brainEngine:
 
 
 
-
     def run(self, time):
         listqueue = [];
         if( not ( time % 20)):
@@ -100,17 +102,20 @@ class brainEngine:
                 if (self.gate.open()):
                     followinstinct = self.feed()
                     self.react(followinstinct)
+                    self.stream_train_bffr += 1
                 self.gate.add(LOCKOUT)
 
             if( self.gate.open() ):
                 image_new = buffer
                 if (self.image_old.any() != image_new.any()):
-                # Detect Beginning or end of stream
+                # Detect End of stream
                     if( self.image_old.any() ):
                         self.gate.remove(STREAM)
-                        self.gate.add(FEED)
+                        self.gate.add(FEED)   ## ====> Skip to feed
+
 
                     elif( image_new.any() ):
+                # Detect the Beginning of a stream
                         self.gate.add(STREAM)
                         if(self.gate.test_boundary):
                             print('Did Not Need to jump 1')
@@ -127,6 +132,7 @@ class brainEngine:
                     followinstinct = self.feed()
                     self.react(followinstinct)
                     self.gate.reset_stream()
+                    self.stream_train_bffr += 1
 
 
             if(self.gate.test_boundary):
@@ -137,8 +143,12 @@ class brainEngine:
                     self.gate.test_boundary = False
 
 
-            #time.sleep(self.SLEEP)
 
+            if( (self.stream_train_bffr != self.train_count) ):
+                boundary_cleared = self.check_scope()
+                if (boundary_cleared == 0):
+                    self.print_to_log('Training')
+                    self.train_count = int(self.stream_train_bffr)
 
     def train(self, label):
         #The stream should always be locked out after termination
@@ -189,10 +199,10 @@ class brainEngine:
             self.print_to_log(msg)
             self.ui.plot.imshow(self.image_sum, interpolation='nearest')
             self.ui.canvas._onSize(1)
-
-
-
+            self.gate.train_lock = True
             return self.followinstinct
+
+
 
     def react(self, instinct):
         if (instinct[0] == 'jump'):
@@ -214,6 +224,9 @@ class brainEngine:
         #Need to pass the projected position of the ball on each call, add a parameter for this
         hit =  self.test_sphere.check_for_players()
 
+    def check_scope(self):
+        return self.sense.scope_boundary.check_for_players_in_scope(self.position)
+
 
     def print_to_log(self,msg):
         self.ui.log.AppendText(msg)
@@ -224,3 +237,5 @@ class brainEngine:
 
     def save(self):
         self.myBrain.trainAndSaveModel(None, None, True)
+
+

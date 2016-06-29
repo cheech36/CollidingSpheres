@@ -140,7 +140,7 @@ class enviornment:
         self.controll_Window.playerManager = self.playerMgr
         # For Dual Monitor x = 1300 is perfect
         # For Monitor Information use xrandr
-        self.scene1 = display(x=1300, y=0, width=1200, height=600)
+        self.scene1 = display(x=800, y=0, width=600, height=800)
         self.scene1.autoscale = False
         self.scene1.title = 'SphereLand Lab Frame'
         self.scene1.range = (30, 10, 5)
