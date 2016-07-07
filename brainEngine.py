@@ -69,6 +69,7 @@ class brainEngine:
         self.stream_count = 0
         self.stream_train_bffr = 0
         self.train_count = 0
+        self.train_label = None
         self.correct_response = 0
         self.trainset = list()
 
@@ -98,11 +99,15 @@ class brainEngine:
                 collision_time = collision_data[0]
                 other_player = collision_data[1]
                 print(' collision at: ', collision_time, 'between', self.playerID, ' and ', other_player)
+                self.train_label = 'jump'
+
 
                 if (self.gate.open()):
                     followinstinct = self.feed()
                     self.react(followinstinct)
                     self.stream_train_bffr += 1
+
+
                 self.gate.add(LOCKOUT)
 
             if( self.gate.open() ):
@@ -144,11 +149,21 @@ class brainEngine:
 
 
 
-            if( (self.stream_train_bffr != self.train_count) ):
-                boundary_cleared = self.check_scope()
-                if (boundary_cleared == 0):
-                    self.print_to_log('Training')
-                    self.train_count = int(self.stream_train_bffr)
+        if( self.train_label == 'jump' and not( self.check_scope())) :
+            self.print_to_log('\nTraining: ')
+            self.print_to_log( 'jump')
+            self.train_count = int(self.stream_train_bffr)
+            self.train(self.train_label)
+            self.train_label = 'none'
+            self.stream_train_bffr = int(self.stream_count)
+        elif(not( self.check_scope()) and self.stream_train_bffr != self.stream_count):
+            self.print_to_log('\nTraining: ')
+            self.print_to_log( 'nojump')
+            self.train(self.train_label)
+            self.train_label = 'none'
+            self.stream_train_bffr = int(self.stream_count)
+
+
 
     def train(self, label):
         #The stream should always be locked out after termination
@@ -158,9 +173,14 @@ class brainEngine:
         # c) The other player has exited the scope boundary
         if( self.gate.lock()):
             if( label == 'jump'):
+                print('jump')
                 label_hot = [1,0]
             elif( label == 'nojump'):
+                print('nojump')
                 label_hot = [0,1]
+            else:
+                print('Training Error')
+                return
 
             np_label = np.array(label_hot)
             train_label = np_label.reshape((1,2))
