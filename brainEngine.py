@@ -73,11 +73,18 @@ class brainEngine:
         self.correct_response = 0
         self.trainset = list()
 
+        self.nojump_count = 0
+        self.jump_count = 0
+        self.correct_count = 0
+        self.jump_skewness = 5
+        self.disparity_old = 0
+        self.disparity_new = 0
+
 
 
         # Status Flags stream,feed,trig,collision,lockout
         # Set Max stream size to 6 images
-        self.gate = Gate(10)
+        self.gate = Gate(12)
 
         self.gate.display_graph = True
         self.gate.display_plot  = False
@@ -92,7 +99,7 @@ class brainEngine:
 
     def run(self, time):
         listqueue = [];
-        if( not ( time % 20)):
+        if( not ( time % 10)):
             buffer = self.sense.look(self.position)
             if (len(self.player.collision_history) > 0):
                 collision_data = self.player.collision_history.pop()
@@ -153,6 +160,7 @@ class brainEngine:
             self.print_to_log('\nTraining: ')
             self.print_to_log( 'jump')
             self.train_count = int(self.stream_train_bffr)
+	    self.jump_count += 1
             self.train(self.train_label)
             self.train_label = 'none'
             self.stream_train_bffr = int(self.stream_count)
@@ -160,6 +168,7 @@ class brainEngine:
             self.print_to_log('\nTraining: ')
             self.print_to_log( 'nojump')
             self.train_label = 'nojump'
+	    self.nojump_count += 1
             self.train(self.train_label)
             self.train_label = 'none'
             self.stream_train_bffr = int(self.stream_count)
@@ -183,6 +192,7 @@ class brainEngine:
                 print('Training Error')
                 return
 
+
             np_label = np.array(label_hot)
             train_label = np_label.reshape((1,2))
             self.myBrain.trainAndSaveModel(self.train_data,train_label)
@@ -193,18 +203,23 @@ class brainEngine:
             self.gate.remove(LOCKOUT)
             self.gate.remove(FEED)
             self.gate.remove(STREAM)
-            self.trainset.append([self.stream_count, label == self.followinstinct[0]])
-            self.correct_response += self.trainset[self.stream_count][1]
-            self.stream_count += 1
-            accuaracy = self.correct_response / self.stream_count
-            print('\nTraining Efficiency: ', accuaracy )
-            if(self.gate.display_graph):
-                self.ui.graph.plot((self.stream_count,accuaracy))
-            print("\n")
 
-        else:
-            print('No Stream Data')
+            self.disparity_new = abs(self.jump_count - self.nojump_count)
 
+            if  self.disparity_new < self.jump_skewness or abs(self.disparity_new) < abs(self.disparity_old):
+
+                self.trainset.append([self.stream_count, label == self.followinstinct[0]])
+                self.correct_response += self.trainset[self.stream_count][1]
+                self.stream_count += 1
+                self.accuaracy = self.correct_response / self.stream_count
+                self.ui.graph.plot((self.stream_count,self.accuaracy))
+
+                print('Training Efficiency: ', self.accuaracy)
+                self.print_to_log('\nDisparity: ' + str(self.jump_count - self.nojump_count))
+
+            else:
+                self.print_to_log('\nData to Skewed, ommit from training\n')
+            self.disparity_old = int(self.disparity_new)
 
 
     def feed(self):
