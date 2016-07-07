@@ -123,9 +123,9 @@ class brainEngine:
                 # Detect the Beginning of a stream
                         self.gate.add(STREAM)
                         if(self.gate.test_boundary):
-                            print('Did Not Need to jump 1')
+                            #print('Did Not Need to jump 1')
                             self.gate.test_boundary = False
-                        self.print_to_log('Starting Stream: ' + str( self.stream_count) + ':   ')
+                        #self.print_to_log('Starting Stream: ' + str( self.stream_count) + ':   ')
 
                 if(self.gate.stream() and not(self.gate.stream_full()) ):
                     self.image_sum += image_new
@@ -159,6 +159,7 @@ class brainEngine:
         elif(not( self.check_scope()) and self.stream_train_bffr != self.stream_count):
             self.print_to_log('\nTraining: ')
             self.print_to_log( 'nojump')
+            self.train_label = 'nojump'
             self.train(self.train_label)
             self.train_label = 'none'
             self.stream_train_bffr = int(self.stream_count)
@@ -196,7 +197,7 @@ class brainEngine:
             self.correct_response += self.trainset[self.stream_count][1]
             self.stream_count += 1
             accuaracy = self.correct_response / self.stream_count
-            print('Train Label', label, 'Training Efficiency: ', accuaracy )
+            print('\nTraining Efficiency: ', accuaracy )
             if(self.gate.display_graph):
                 self.ui.graph.plot((self.stream_count,accuaracy))
             print("\n")
@@ -215,7 +216,10 @@ class brainEngine:
                 inputneurons = self.image_sum.reshape((1, self.scope_x * self.scope_z)) / N
             self.train_data = np.array(inputneurons)
             self.followinstinct = self.myBrain.feedForwardOnly(inputneurons);
-            msg = 'Response: ' + str(self.followinstinct[0]) + 'Confidence: ' + str(self.followinstinct[1]) + '\n'
+            #msg = 'Response: ' + str(self.followinstinct[0]) + 'Confidence: ' + str(self.followinstinct[1]) + '\n'
+            msg = '\n\nTraining Stream: ' + str(self.stream_count)
+            self.print_to_log(msg)
+            msg = '\nResponse: ' + str(self.followinstinct[0])
             self.print_to_log(msg)
             self.ui.plot.imshow(self.image_sum, interpolation='nearest')
             self.ui.canvas._onSize(1)

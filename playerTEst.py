@@ -106,7 +106,7 @@ class enviornment:
         # self.playerMgr.setAsWalker(self.Walker2)clear
 
         ## Other Player Attributes
-        self.playerMgr.buildPlayers(sphere(radius=2, color=color.red, opacity=1), vector(0, -6, 0), materials.wood, 0)
+        self.playerMgr.buildPlayers(sphere(radius=2, color = (.996,.616,.016), opacity=1), vector(0, -6, 0), materials.wood, 0)
         self.playerMgr.buildPlayers(sphere(radius=2, color=color.green, opacity=1), vector(0, -6, 0), materials.wood, 1)
         # self.playerMgr.buildPlayers(sphere(radius = 2, color = color.green, opacity = 1 ), vector(0,-6,0), materials.wood, 2)
         # self.playerMgr.buildPlayers(sphere(radius = 2, color = (.996,.616,.016), opacity = 1), vector(0,-6, 0), materials.wood, 3)
@@ -140,7 +140,7 @@ class enviornment:
         self.controll_Window.playerManager = self.playerMgr
         # For Dual Monitor x = 1300 is perfect
         # For Monitor Information use xrandr
-        self.scene1 = display(x=800, y=0, width=600, height=800)
+        self.scene1 = display(x=1400, y=0, width=1200, height=900)
         self.scene1.autoscale = False
         self.scene1.title = 'SphereLand Lab Frame'
         self.scene1.range = (30, 10, 5)
