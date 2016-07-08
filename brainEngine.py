@@ -75,8 +75,10 @@ class brainEngine:
 
         self.nojump_count = 0
         self.jump_count = 0
+        self.nojump_count_bffr = 0
+        self.jump_count_bffr = 0
         self.correct_count = 0
-        self.jump_skewness = 5
+        self.jump_skewness = 3
         self.disparity_old = 0
         self.disparity_new = 0
 
@@ -160,7 +162,6 @@ class brainEngine:
             self.print_to_log('\nTraining: ')
             self.print_to_log( 'jump')
             self.train_count = int(self.stream_train_bffr)
-	    self.jump_count += 1
             self.train(self.train_label)
             self.train_label = 'none'
             self.stream_train_bffr = int(self.stream_count)
@@ -168,7 +169,6 @@ class brainEngine:
             self.print_to_log('\nTraining: ')
             self.print_to_log( 'nojump')
             self.train_label = 'nojump'
-	    self.nojump_count += 1
             self.train(self.train_label)
             self.train_label = 'none'
             self.stream_train_bffr = int(self.stream_count)
@@ -184,8 +184,10 @@ class brainEngine:
         if( self.gate.lock()):
             if( label == 'jump'):
                 print('jump')
+                self.jump_count_bffr += 1
                 label_hot = [1,0]
             elif( label == 'nojump'):
+                self.nojump_count_bffr += 1
                 print('nojump')
                 label_hot = [0,1]
             else:
@@ -204,7 +206,7 @@ class brainEngine:
             self.gate.remove(FEED)
             self.gate.remove(STREAM)
 
-            self.disparity_new = abs(self.jump_count - self.nojump_count)
+            self.disparity_new = abs(self.jump_count + self.jump_count_bffr - self.nojump_count - self.nojump_count_bffr)
 
             if  self.disparity_new < self.jump_skewness or abs(self.disparity_new) < abs(self.disparity_old):
 
@@ -217,9 +219,17 @@ class brainEngine:
                 print('Training Efficiency: ', self.accuaracy)
                 self.print_to_log('\nDisparity: ' + str(self.jump_count - self.nojump_count))
 
+                self.jump_count += self.jump_count_bffr
+                self.nojump_count += self.nojump_count_bffr
+                self.disparity_old = int(self.disparity_new)
+
             else:
                 self.print_to_log('\nData to Skewed, ommit from training\n')
-            self.disparity_old = int(self.disparity_new)
+
+            self.jump_count_bffr = 0
+            self.nojump_count_bffr = 0
+
+
 
 
     def feed(self):
