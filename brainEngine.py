@@ -72,25 +72,13 @@ class brainEngine:
         self.train_label = None
         self.correct_response = 0
         self.trainset = list()
-
-        self.nojump_count = 0
-        self.jump_count = 0
-
-        self.correct_count = 0
-        self.jump_skewness = 3
-
-
-
-
-        # Status Flags stream,feed,trig,collision,lockout
-        # Set Max stream size to 6 images
         self.gate = Gate(12)
-
         self.gate.display_graph = True
         self.gate.display_plot  = False
-        #if(self.gate.display_graph):
-        #    self.train_graph = self.ui.graph
-
+        self.nojump_count = 0
+        self.jump_count = 0
+        self.correct_count = 0
+        self.jump_skewness = 3
         # Make the bain
         self.myBrain = NeuralBrain("NeuralModel_Logit_1Hl-n50_2Outputs", self.scope_x*self.scope_z, 1, 50);
         self.myBrain.loadPersistentModel();
@@ -107,15 +95,15 @@ class brainEngine:
                 other_player = collision_data[1]
                 print(' collision at: ', collision_time, 'between', self.playerID, ' and ', other_player)
                 self.train_label = 'jump'
-
+                ## There are exceptions to this label when more than one player is involved, however these cases
+                ## are expected to be rare and will be worked out in the future if necessary
 
                 if (self.gate.open()):
                     followinstinct = self.feed()
                     self.react(followinstinct)
                     self.stream_train_bffr += 1
 
-
-                self.gate.add(LOCKOUT)
+                self.gate.add(LOCKOUT)  # ---> Self.gate.open() returns False
 
             if( self.gate.open() ):
                 image_new = buffer
@@ -147,12 +135,14 @@ class brainEngine:
                     self.stream_train_bffr += 1
 
 
-            if(self.gate.test_boundary):
-                self.should_have_jumped = self.check_test_boundary()
-                # Where the ball would be if it had not jumped
-                if(self.should_have_jumped):
-                    print('Should have jumped')
-                    self.gate.test_boundary = False
+        if(self.gate.test_boundary):
+            self.should_have_jumped = self.check_test_boundary()
+            #self.print_to_log('TB Status: ' + str(self.should_have_jumped))
+            # Where the ball would be if it had not jumped
+            if(self.should_have_jumped):
+                #self.print_to_log('Should have jumped')
+                self.train_label = 'jump'
+                self.gate.test_boundary = False
 
 
 
@@ -218,7 +208,14 @@ class brainEngine:
             self.image_sum = self.sense.blank()
             self.image_old = self.sense.blank()
             self.stream_size = 0
-
+            if ( self.gate.test_boundary):
+                self.gate.test_boundary = False
+                '''
+                self.print_to_log('\nTurning off Test Boundary\n')
+                self.test_sphere_visual.radius = 0
+                self.test_sphere_visual.visible = False
+                del self.test_sphere_visual
+                '''
 
     def feed(self):
             self.gate.remove(FEED)
@@ -253,13 +250,18 @@ class brainEngine:
         # must use a reference to current position
         # Revisit this
 
-        self.test_sphere = bs(self.playerID,vector(self.position),2)
+        self.test_sphere = bs(self.playerID,self.position,self.player.body.radius)
+        # Project position onto the floor where it would be if it had not jumped
+        self.test_sphere.position[1] = 0
+        #self.test_sphere_visual = sphere(pos = self.test_sphere.position + vector(0,-6,0), radius=1, color = color.red, opacity = .3)
         self.gate.test_boundary = True
+        #self.print_to_log('\nTurning on Test Boundary')
 
 
     def check_test_boundary(self):
         #Need to pass the projected position of the ball on each call, add a parameter for this
         hit =  self.test_sphere.check_for_players()
+        return hit
 
     def check_scope(self):
         return self.sense.scope_boundary.check_for_players_in_scope(self.position)

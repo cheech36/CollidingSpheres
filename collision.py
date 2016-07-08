@@ -92,9 +92,10 @@ class aabb:
 class bs:
     playerManager = None
     def __init__(self, id, position, radius=2 ):
-        self.position = position
+        self.position = vector(position)
         self.radius   = radius
         self.playerID = id
+
 
     def contains_players(self, player_position, player_radius = 2):
         disp = player_position - self.position
