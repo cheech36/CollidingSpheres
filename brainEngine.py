@@ -75,12 +75,10 @@ class brainEngine:
 
         self.nojump_count = 0
         self.jump_count = 0
-        self.nojump_count_bffr = 0
-        self.jump_count_bffr = 0
+
         self.correct_count = 0
         self.jump_skewness = 3
-        self.disparity_old = 0
-        self.disparity_new = 0
+
 
 
 
@@ -184,52 +182,42 @@ class brainEngine:
         if( self.gate.lock()):
             if( label == 'jump'):
                 print('jump')
-                self.jump_count_bffr += 1
+                jump_count_bffr = 1
                 label_hot = [1,0]
             elif( label == 'nojump'):
-                self.nojump_count_bffr += 1
+                jump_count_bffr = -1
                 print('nojump')
                 label_hot = [0,1]
             else:
                 print('Training Error')
                 return
 
-
             np_label = np.array(label_hot)
             train_label = np_label.reshape((1,2))
-            self.myBrain.trainAndSaveModel(self.train_data,train_label)
-            #print(self.image_sum)
-            self.image_sum = self.sense.blank()
-            self.image_old = self.sense.blank()
-            self.stream_size = 0
+
             self.gate.remove(LOCKOUT)
             self.gate.remove(FEED)
             self.gate.remove(STREAM)
 
-            self.disparity_new = abs(self.jump_count + self.jump_count_bffr - self.nojump_count - self.nojump_count_bffr)
-
-            if  self.disparity_new < self.jump_skewness or abs(self.disparity_new) < abs(self.disparity_old):
-
+            if abs(self.jump_count + jump_count_bffr) < self.jump_skewness:
+                self.jump_count += jump_count_bffr
+                self.myBrain.trainAndSaveModel(self.train_data,train_label)
                 self.trainset.append([self.stream_count, label == self.followinstinct[0]])
                 self.correct_response += self.trainset[self.stream_count][1]
                 self.stream_count += 1
                 self.accuaracy = self.correct_response / self.stream_count
                 self.ui.graph.plot((self.stream_count,self.accuaracy))
-
+                self.print_to_log('\nJumpCount: ' + str(self.jump_count))
                 print('Training Efficiency: ', self.accuaracy)
-                self.print_to_log('\nDisparity: ' + str(self.jump_count - self.nojump_count))
-
-                self.jump_count += self.jump_count_bffr
-                self.nojump_count += self.nojump_count_bffr
-                self.disparity_old = int(self.disparity_new)
 
             else:
-                self.print_to_log('\nData to Skewed, ommit from training\n')
+                print('Training Efficiency: ', self.accuaracy)
+                self.print_to_log('\nJumpCount: ' + str(self.jump_count))
+                self.print_to_log('\nData too skewed, ommiting stream')
 
-            self.jump_count_bffr = 0
-            self.nojump_count_bffr = 0
-
-
+            self.image_sum = self.sense.blank()
+            self.image_old = self.sense.blank()
+            self.stream_size = 0
 
 
     def feed(self):
