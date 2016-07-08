@@ -198,10 +198,12 @@ class brainEngine:
                 self.accuaracy = self.correct_response / self.stream_count
                 self.ui.graph.plot((self.stream_count,self.accuaracy))
                 self.print_to_log('\nJumpCount: ' + str(self.jump_count))
-                print('Training Efficiency: ', self.accuaracy)
+                self.print_to_efficiency_log(str(self.accuaracy))
+                #print('Training Efficiency: ', self.accuaracy)
 
             else:
-                print('Training Efficiency: ', self.accuaracy)
+                #print('Training Efficiency: ', self.accuaracy)
+                self.print_to_efficiency_log(str(self.accuaracy))
                 self.print_to_log('\nJumpCount: ' + str(self.jump_count))
                 self.print_to_log('\nData too skewed, ommiting stream')
 
@@ -272,6 +274,10 @@ class brainEngine:
         #A = np.random.randint(25, size=(5, 5) )
         #p1 = self.ui.plot.add_subplot(111)
         #p1.imshow(A, interpolation='nearest')
+
+    def print_to_efficiency_log(self,msg):
+        self.ui.controll_window.efficiency_msg.Clear()
+        self.ui.controll_window.efficiency_msg.AppendText(msg[0:5])
 
 
     def save(self):
