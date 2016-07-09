@@ -85,8 +85,8 @@ class NeuralBrain: # each input neuron has 2 columns and we'll add-ish them toge
             # Predictions for the training, validation, and test data.
       self.train_prediction = tf.nn.softmax(self.logits3);
       self.train_loss = tf.reduce_mean (tf.nn.softmax_cross_entropy_with_logits (self.logits3, self.tf_train_labels));
-      #self.optimizer = tf.train.GradientDescentOptimizer(0.1).minimize (self.train_loss);
-      self.optimizer = tf.train.FtrlOptimizer (0.9).minimize(self.train_loss)
+      self.optimizer = tf.train.GradientDescentOptimizer(0.02).minimize (self.train_loss);
+      #self.optimizer = tf.train.FtrlOptimizer (0.9).minimize(self.train_loss)
     
       # Add summary ops to collect data
       self.tb_summ_hist_w1 = tf.histogram_summary("weights1", self.weights1)

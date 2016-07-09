@@ -141,7 +141,7 @@ class playerManager:
         if newPlayerPosition.z > 19:
             newPlayerPosition.z = 15
         newPlayer = self.createPlayer( newPlayerPosition )
-        self.buildPlayers(sphere(radius = 2, color = color.red ), vector(0,-6,0), materials.wood, newPlayer.getID() )
+        self.buildPlayers(sphere(radius = 1, color = color.red ), vector(0,-6,0), materials.wood, newPlayer.getID() )
         newPlayer.updatePosition()
         newPlayer.setAcceleration(vector(0,-9.81,0))
         id = newPlayer.getID()      ## Use PlayerID to generate a new color

@@ -80,7 +80,7 @@ class brainEngine:
         self.correct_count = 0
         self.jump_skewness = 3
         # Make the bain
-        self.myBrain = NeuralBrain("NeuralModel_Logit_1Hl-n50_2Outputs", self.scope_x*self.scope_z, 1, 50);
+        self.myBrain = NeuralBrain("NeuralModel_Logit_2Hl-n200_2Outputs", self.scope_x*self.scope_z, 1, 200);
         self.myBrain.loadPersistentModel();
 
 
@@ -205,7 +205,7 @@ class brainEngine:
                 #print('Training Efficiency: ', self.accuaracy)
                 self.print_to_efficiency_log(str(self.accuaracy))
                 self.print_to_log('\nJumpCount: ' + str(self.jump_count))
-                self.print_to_log('\nData too skewed, ommiting stream')
+                #self.print_to_log('\nData too skewed, ommiting stream')
 
             self.image_sum = self.sense.blank()
             self.image_old = self.sense.blank()

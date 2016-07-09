@@ -141,7 +141,7 @@ class enviornment:
         self.controll_Window.ENV = self
         # For Dual Monitor x = 1300 is perfect
         # For Monitor Information use xrandr
-        self.scene1 = display(x=1400, y=0, width=1200, height=900)
+        self.scene1 = display(x=100, y=0, width=1200, height=900)
         self.scene1.autoscale = False
         self.scene1.title = 'SphereLand Lab Frame'
         self.scene1.range = (30, 10, 5)
