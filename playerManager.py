@@ -249,7 +249,7 @@ class playerManager:
         if(not(mode)):
             self.ui.controll_window.ToggleFriction('manager')
 
-    def save(self):
+    def save(self,name):
         for player in self.activePlayers:
             if player.getType() == 'smartPlayer':
-                player.save()
+                player.save(name)

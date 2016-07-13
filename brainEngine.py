@@ -78,6 +78,7 @@ class brainEngine:
         self.nojump_count = 0
         self.jump_count = 0
         self.correct_count = 0
+        self.feed_count = 0
         self.jump_skewness = 3
         # Make the bain
         self.myBrain = NeuralBrain("NeuralModel_Logit_2Hl-n200_2Outputs", self.scope_x*self.scope_z, 1, 200);
@@ -118,9 +119,7 @@ class brainEngine:
                 # Detect the Beginning of a stream
                         self.gate.add(STREAM)
                         if(self.gate.test_boundary):
-                            #print('Did Not Need to jump 1')
                             self.gate.test_boundary = False
-                        #self.print_to_log('Starting Stream: ' + str( self.stream_count) + ':   ')
 
                 if(self.gate.stream() and not(self.gate.stream_full()) ):
                     self.image_sum += image_new
@@ -137,12 +136,11 @@ class brainEngine:
 
         if(self.gate.test_boundary):
             self.should_have_jumped = self.check_test_boundary()
-            #self.print_to_log('TB Status: ' + str(self.should_have_jumped))
             # Where the ball would be if it had not jumped
             if(self.should_have_jumped):
-                #self.print_to_log('Should have jumped')
                 self.train_label = 'jump'
                 self.gate.test_boundary = False
+                self.test_sphere.end()
 
 
 
@@ -169,7 +167,13 @@ class brainEngine:
         # a) Stream is full
         # b) A collision has occured
         # c) The other player has exited the scope boundary
+
         if( self.gate.lock()):
+
+
+            #print(self.followinstinct, self.train_label)
+            self.correct_count += (self.followinstinct[0] == self.train_label)
+            self.print_to_total_efficiency_log(str(self.correct_count/self.feed_count))
             if( label == 'jump'):
                 print('jump')
                 jump_count_bffr = 1
@@ -198,28 +202,26 @@ class brainEngine:
                 self.accuaracy = self.correct_response / self.stream_count
                 self.ui.graph.plot((self.stream_count,self.accuaracy))
                 self.print_to_log('\nJumpCount: ' + str(self.jump_count))
-                self.print_to_efficiency_log(str(self.accuaracy))
-                #print('Training Efficiency: ', self.accuaracy)
-
+                self.print_to_train_efficiency_log(str(self.accuaracy))
+                self.ui.plot.imshow(self.image_sum, interpolation='nearest')
+                self.ui.canvas._onSize(1)
             else:
-                #print('Training Efficiency: ', self.accuaracy)
-                self.print_to_efficiency_log(str(self.accuaracy))
+                self.print_to_train_efficiency_log(str(self.accuaracy))
                 self.print_to_log('\nJumpCount: ' + str(self.jump_count))
-                #self.print_to_log('\nData too skewed, ommiting stream')
+
+
 
             self.image_sum = self.sense.blank()
             self.image_old = self.sense.blank()
             self.stream_size = 0
+
             if ( self.gate.test_boundary):
                 self.gate.test_boundary = False
-                '''
-                self.print_to_log('\nTurning off Test Boundary\n')
-                self.test_sphere_visual.radius = 0
-                self.test_sphere_visual.visible = False
-                del self.test_sphere_visual
-                '''
+                self.test_sphere.end()
+
 
     def feed(self):
+            self.feed_count += 1
             self.gate.remove(FEED)
             if(self.gate.display_plot):
                 plt.imshow(self.image_sum, interpolation='nearest')
@@ -228,13 +230,10 @@ class brainEngine:
                 inputneurons = self.image_sum.reshape((1, self.scope_x * self.scope_z)) / N
             self.train_data = np.array(inputneurons)
             self.followinstinct = self.myBrain.feedForwardOnly(inputneurons);
-            #msg = 'Response: ' + str(self.followinstinct[0]) + 'Confidence: ' + str(self.followinstinct[1]) + '\n'
             msg = '\n\nTraining Stream: ' + str(self.stream_count)
             self.print_to_log(msg)
             msg = '\nResponse: ' + str(self.followinstinct[0])
             self.print_to_log(msg)
-            self.ui.plot.imshow(self.image_sum, interpolation='nearest')
-            self.ui.canvas._onSize(1)
             self.gate.train_lock = True
             return self.followinstinct
 
@@ -247,21 +246,12 @@ class brainEngine:
             self.drop_test_boundary(self.position)
 
     def drop_test_boundary(self, position):
-        # Must create a test sphere where the ball would be if it had not jumped.
-        # To do this must project the current position of  ball on to floor, however a copy will not work for this,
-        # must use a reference to current position
-        # Revisit this
-
-        self.test_sphere = bs(self.playerID,self.position,self.player.body.radius)
+        self.test_sphere = bs(self.playerID,self.position,self.player.body.radius, True)
         # Project position onto the floor where it would be if it had not jumped
-        self.test_sphere.position[1] = 0
-        #self.test_sphere_visual = sphere(pos = self.test_sphere.position + vector(0,-6,0), radius=1, color = color.red, opacity = .3)
         self.gate.test_boundary = True
-        #self.print_to_log('\nTurning on Test Boundary')
 
 
     def check_test_boundary(self):
-        #Need to pass the projected position of the ball on each call, add a parameter for this
         hit =  self.test_sphere.check_for_players()
         return hit
 
@@ -271,16 +261,17 @@ class brainEngine:
 
     def print_to_log(self,msg):
         self.ui.log.AppendText(msg)
-        #A = np.random.randint(25, size=(5, 5) )
-        #p1 = self.ui.plot.add_subplot(111)
-        #p1.imshow(A, interpolation='nearest')
 
-    def print_to_efficiency_log(self,msg):
-        self.ui.controll_window.efficiency_msg.Clear()
-        self.ui.controll_window.efficiency_msg.AppendText(msg[0:5])
+    def print_to_train_efficiency_log(self,msg):
+        self.ui.controll_window.train_efficiency_msg.Clear()
+        self.ui.controll_window.train_efficiency_msg.AppendText(msg[0:5])
+
+    def print_to_total_efficiency_log(self,msg):
+        self.ui.controll_window.total_efficiency_msg.Clear()
+        self.ui.controll_window.total_efficiency_msg.AppendText(msg[0:5])
 
 
-    def save(self):
-        self.myBrain.trainAndSaveModel(None, None, True)
+    def save(self, name):
+        self.myBrain.trainAndSaveModel(None,None,True, name)
 
 

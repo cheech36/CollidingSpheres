@@ -36,7 +36,7 @@ class NeuralBrain: # each input neuron has 2 columns and we'll add-ish them toge
        
          
   # train the model.  The model will always be saved to disk in case reloading is desired 
-  def trainAndSaveModel (self, batch_data, batch_labels, save=False):
+  def trainAndSaveModel (self, batch_data, batch_labels, save=False, name=None):
     with self.tfsession.as_default ():
 
        if(not(save)):
@@ -48,9 +48,9 @@ class NeuralBrain: # each input neuron has 2 columns and we'll add-ish them toge
     #       print "Minibatch loss at current runtime step", self.runtimestep, ":", train_loss;
            self.runtimestep += 1;
        if(save):
-           writer = tf.train.SummaryWriter(self.brainlogdir, self.tfsession.graph_def)
-           writer.add_summary(tb_merged, self.runtimestep);
-           self.saver.save (self.tfsession, self.brainmodeldir)
+           #writer = tf.train.SummaryWriter(self.brainlogdir, self.tfsession.graph_def)
+           #writer.add_summary(tb_merged, self.runtimestep);
+           self.saver.save (self.tfsession, name)
        
     
   def __init__ (self, modelname, input_size, batch_size, layer1_hidden_numnodes):

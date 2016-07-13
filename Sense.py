@@ -15,7 +15,7 @@ class sense:
         self.dt = 1
         # Used only for visualization of net, not for detection.
         self.net_visual_display = list()
-        self.net_visible_f = True
+        self.net_visible_f = False
         self.blank_image = np.ndarray(())
         self.net = self.formNet(scope)
         self.image = None

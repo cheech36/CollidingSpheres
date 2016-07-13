@@ -26,5 +26,5 @@ class smartPlayer2 (player):
     def train(self, label):
         self.brain.train(label)
 
-    def save(self):
-        self.brain.save()
+    def save(self,name):
+        self.brain.save(name)

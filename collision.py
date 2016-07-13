@@ -91,14 +91,23 @@ class aabb:
 # Bounding Sphere Class
 class bs:
     playerManager = None
-    def __init__(self, id, position, radius=2 ):
+    def __init__(self, id, position, radius=2, show=False ):
         self.position = vector(position)
         self.radius   = radius
         self.playerID = id
+        self.show = show
+        if( self.show ):
 
+            self.test_sphere_visual = sphere(pos=self.position, radius=1, color=color.red, opacity=.3)
+            self.test_sphere_visual.pos.y = -6
 
     def contains_players(self, player_position, player_radius = 2):
-        disp = player_position - self.position
+        if(self.show):
+            self.test_sphere_visual.pos.x = self.position.x
+            self.test_sphere_visual.pos.z = self.position.z
+        pos = vector(self.position)
+        pos.y = 0
+        disp = player_position - pos
         distance = mag(disp)
         dist_min = self.radius + player_radius
         if(distance <= dist_min):
@@ -113,6 +122,13 @@ class bs:
             if(self.contains_players(incomingPlayer.getPosition()) and (id != self.playerID)):
                 return True
         return False
+
+    def end(self):
+        if (self.show):
+            self.test_sphere_visual.radius = 0
+            self.test_sphere_visual.visible = False
+            del self.test_sphere_visual
+
 
 
 # Bounding Plane

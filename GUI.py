@@ -13,6 +13,34 @@ import playerManager
 from collision import CollisionMonitor
 
 
+class SaveDialog(wx.Dialog):
+    playerManager = None
+    def __init__(self, *args, **kw):
+        super(SaveDialog,self).__init__(*args, **kw)
+        self.InitUI()
+        self.SetSize((500, 150))
+        self.SetTitle("Save Network")
+        print("Saving ...")
+
+    def InitUI(self):
+        save_panel=wx.Panel(self)
+        vbox_1 = wx.BoxSizer(wx.VERTICAL)
+        hbox_1 = wx.BoxSizer(wx.HORIZONTAL)
+        saveText = wx.StaticText(save_panel, label="Filename: ")
+        self.filename = wx.TextCtrl(save_panel, size=(300, -1))
+        self.submit = wx.Button(save_panel, size=(-1, 30), label="Save")
+        self.submit.Bind(wx.EVT_BUTTON,self.OnSave)
+        hbox_1.Add(saveText, flag=wx.LEFT, border=5)
+        hbox_1.Add(self.filename, flag=wx.LEFT, border=5)
+        hbox_1.Add(self.submit, flag=wx.LEFT, border=5)
+        vbox_1.AddSpacer(50)
+        vbox_1.Add(hbox_1, flag=wx.LEFT, border=15)
+        save_panel.SetSizer(vbox_1)
+
+    def OnSave(self,e):
+        name = self.filename.GetValue()
+        self.playerManager.save(name)
+        self.Destroy()
 
 
 class ControllPanel(wx.Frame):
@@ -107,9 +135,12 @@ class DisplayPanel(wx.Frame):
         self.Close()
 
     def OnSave(self, e):
-        self.msg.AppendText("Saving current state of Neural Network")
-        print('Saving Disabled')
-        #self.playerManager.save()
+
+        SaveDialog.playerManager = self.playerManager
+        save = SaveDialog(None,title='Save Neural Network')
+        save.ShowModal()
+        #print('Saving Disabled')
+        save.Destroy()
 
     def OnPlayerChange(self,e):
         self.sc_player.SetRange(1,self.playerManager.playerCount)
@@ -136,6 +167,8 @@ class DisplayPanel(wx.Frame):
         hbox3 = wx.BoxSizer(wx.HORIZONTAL)
         hbox5 = wx.BoxSizer(wx.HORIZONTAL)
         hbox6 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox7 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox8 = wx.BoxSizer(wx.HORIZONTAL)
 
         hbox1.Add(wx.StaticText(self.controll_panel,label='Active Player: '),flag=wx.LEFT, border = 20)
         self.sc_player = wx.SpinCtrl(self.controll_panel, value='1', size=(60,-1))
@@ -161,9 +194,13 @@ class DisplayPanel(wx.Frame):
         hbox5.Add(self.rb8,flag=wx.LEFT, border=5)
 
 
-        self.efficiency_msg = wx.TextCtrl(self.controll_panel, size=(50,-1))
+        self.train_efficiency_msg = wx.TextCtrl(self.controll_panel, size=(50,-1))
+        self.total_efficiency_msg = wx.TextCtrl(self.controll_panel, size=(50,-1))
         hbox6.Add(wx.StaticText(self.controll_panel, label='Efficiency: '), flag=wx.LEFT, border = 10)
-        hbox6.Add(self.efficiency_msg)
+        hbox7.Add(wx.StaticText(self.controll_panel, label='Training: '), flag = wx.LEFT, border = 10)
+        hbox7.Add(self.train_efficiency_msg)
+        hbox8.Add(wx.StaticText(self.controll_panel, label='Total: '), flag = wx.LEFT, border = 10)
+        hbox8.Add(self.total_efficiency_msg)
 
         self.bounce_slider = wx.Slider(self.controll_panel, value=0, minValue=0, maxValue=100, size=(150,-1), style=wx.SL_HORIZONTAL)
         self.bounce_slider.Bind(wx.EVT_SCROLL,self.OnBounceScroll)
@@ -189,6 +226,8 @@ class DisplayPanel(wx.Frame):
         vbox_cont.Add(wx.StaticText(self.controll_panel, label='Training Speed: '), flag=wx.LEFT|wx.TOP, border = 10)
         vbox_cont.Add(hbox5, flag = wx.TOP, border = 0)
         vbox_cont.Add(hbox6, flag = wx.TOP, border = 10)
+        vbox_cont.Add(hbox7, flag = wx.TOP, border = 10)
+        vbox_cont.Add(hbox8, flag = wx.TOP, border = 10)
         vbox_cont.Add(hbox2, flag = wx.TOP, border = 10)
         vbox_cont.Add(hbox3, flag = wx.TOP, border = 10)
         vbox_cont.Add(hbox4, flag = wx.TOP|wx.ALIGN_CENTER, border = 10)
@@ -267,7 +306,6 @@ class DisplayPanel(wx.Frame):
             self.ENV.rate = 800
         elif state4:
             self.ENV.rate = 1600
-
 
 
 class GraphPanel:
